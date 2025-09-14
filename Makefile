@@ -8,11 +8,11 @@ release: all
 	cd result && tar -czvf VSModUpdater-Linux.tar.gz VSModUpdater
 
 linux:
-	CGO_ENABLED=1 \
+	CGO_ENABLED=0 \
 	GOOS=linux \
 	go build -ldflags='-s -w' -o result/VSModUpdater ./cmd/VSModUpdater
 
 windows:
-	CGO_ENABLED=1 \
+	CGO_ENABLED=0 \
 	GOOS=windows \
 	go build -ldflags='-s -w' -o result/VSModUpdater.exe ./cmd/VSModUpdater
