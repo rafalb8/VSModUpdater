@@ -18,21 +18,23 @@ import (
 type Info struct {
 	Path string `json:"-"`
 
-	Type             Type              `json:"type"`
-	Name             string            `json:"name"`
-	ModID            string            `json:"modid,omitempty"`
-	Version          string            `json:"version"`
-	NetworkVersion   string            `json:"networkVersion,omitempty"`
-	TextureSize      int               `json:"textureSize,omitempty"`
-	Description      string            `json:"description,omitempty"`
-	Website          string            `json:"website,omitempty"`
-	IconPath         string            `json:"iconPath,omitempty"`
-	Authors          []string          `json:"authors,omitempty"`
-	Contributors     []string          `json:"contributors,omitempty"`
-	Side             AppSide           `json:"side,omitempty"`
-	RequiredOnClient bool              `json:"requiredOnClient,omitempty"`
-	RequiredOnServer bool              `json:"requiredOnServer,omitempty"`
-	Dependencies     map[string]string `json:"dependencies,omitempty"`
+	Type    Type   `json:"type"`
+	Name    string `json:"name"`
+	Version string `json:"version"`
+	ModID   string `json:"modid,omitempty"`
+
+	// TODO: fix unmarshal string bools
+	// NetworkVersion   string            `json:"networkVersion,omitempty"`
+	// TextureSize      int               `json:"textureSize,omitempty"`
+	// Description      string            `json:"description,omitempty"`
+	// Website          string            `json:"website,omitempty"`
+	// IconPath         string            `json:"iconPath,omitempty"`
+	// Authors          []string          `json:"authors,omitempty"`
+	// Contributors     []string          `json:"contributors,omitempty"`
+	// Side             AppSide           `json:"side,omitempty"`
+	// RequiredOnClient bool              `json:"requiredOnClient,omitempty"`
+	// RequiredOnServer bool              `json:"requiredOnServer,omitempty"`
+	// Dependencies     map[string]string `json:"dependencies,omitempty"`
 }
 
 func InfoFromZip(path string) (*Info, error) {
@@ -63,6 +65,7 @@ func (i *Info) String() string {
 
 // CheckUpdates returns url to latest mod version
 func (i *Info) CheckUpdates() (Update, error) {
+	// TODO: Fix search when ModID is missing
 	uri, err := url.JoinPath("https://mods.vintagestory.at/api/mod/", i.ModID)
 	if err != nil {
 		return Update{}, fmt.Errorf("Info.CheckUpdates: %w", err)
