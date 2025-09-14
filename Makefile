@@ -1,7 +1,9 @@
+TAG ?= v0.0.0
 
 all: linux windows
 
 release: all
+	cd result && zip VSModUpdater-$(TAG).zip VSModUpdater VSModUpdater.exe
 	cd result && zip VSModUpdater-Windows.zip VSModUpdater.exe
 	cd result && tar -czvf VSModUpdater-Linux.tar.gz VSModUpdater
 

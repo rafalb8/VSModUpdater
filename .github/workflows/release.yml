@@ -24,8 +24,8 @@ jobs:
         check-latest: true
 
     - name: Build
-      run: make release
-    
+      run: make release TAG=${{ github.ref_name }}
+
     - name: Release
       uses: ncipollo/release-action@v1
       with:
