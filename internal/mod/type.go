@@ -30,11 +30,11 @@ func (t *Type) MarshalJSON() ([]byte, error) {
 func (t *Type) UnmarshalJSON(typ []byte) error {
 	typStr := strings.Trim(string(typ), `"`)
 	switch strings.ToLower(typStr) {
-	case "theme":
+	case "theme", "0":
 		*t = Theme
-	case "content":
+	case "content", "1":
 		*t = Content
-	case "code":
+	case "code", "2":
 		*t = Code
 	default:
 		return fmt.Errorf("mod.Type: unknown value: %s", typStr)

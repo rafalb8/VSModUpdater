@@ -24,9 +24,9 @@ func (a *AppSide) MarshalJSON() ([]byte, error) {
 
 func (a *AppSide) UnmarshalJSON(side []byte) error {
 	switch strings.ToLower(strings.Trim(string(side), `"`)) {
-	case "server":
+	case "server", "1":
 		*a = Server
-	case "client":
+	case "client", "2":
 		*a = Client
 	default:
 		*a = Universal

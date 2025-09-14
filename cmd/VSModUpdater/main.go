@@ -15,7 +15,7 @@ func main() {
 	flag.Parse()
 
 	mods := []*mod.Info{}
-	filepath.WalkDir(config.ModPath, func(path string, d fs.DirEntry, err error) error {
+	err := filepath.WalkDir(config.ModPath, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
@@ -39,6 +39,10 @@ func main() {
 		mods = append(mods, info)
 		return nil
 	})
+
+	if err != nil {
+		panic(err)
+	}
 
 	if len(mods) == 0 {
 		fmt.Println("No Mods found")
