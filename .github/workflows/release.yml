@@ -13,7 +13,7 @@ jobs:
 
     permissions:
       contents: write
-    
+
     steps:
     - uses: actions/checkout@v5
 
@@ -24,10 +24,10 @@ jobs:
         check-latest: true
 
     - name: Build
-      run: make all
+      run: make release
     
     - name: Release
       uses: ncipollo/release-action@v1
       with:
         allowUpdates: true
-        artifacts: ./result/*
+        artifacts: ./result/*-*.*
