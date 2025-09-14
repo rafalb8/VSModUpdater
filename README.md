@@ -1,2 +1,2 @@
 # VSModUpdater
-Vintage Story Mod Updater
+Vintage Story Mod Updater - [ModDB](https://mods.vintagestory.at/modupdater)
