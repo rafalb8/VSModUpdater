@@ -1,0 +1,29 @@
+name: Release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+    - '*'
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+
+    - name: Set up Go
+      uses: actions/setup-go@v6
+      with:
+        go-version: 'stable'
+        check-latest: true
+
+    - name: Build
+      run: make all
+    
+    - name: Release
+      uses: ncipollo/release-action@v1
+      with:
+        allowUpdates: true
+        artifacts: ./result/*
