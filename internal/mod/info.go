@@ -115,7 +115,6 @@ func (i *Info) CheckUpdates() (Update, error) {
 	}
 
 	for _, release := range r.Mod.Releases {
-		fmt.Println(release.ModVersion > i.Version, release.ModVersion, i.Version)
 		if release.ModVersion > i.Version {
 			return Update{
 				URL:      release.Mainfile,
