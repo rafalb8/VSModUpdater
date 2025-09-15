@@ -3,6 +3,7 @@ package mod
 import "errors"
 
 var ErrNoUpdate = errors.New("no update")
+var ErrNoModID = errors.New("no modid")
 
 type Response struct {
 	Mod        Mod    `json:"mod,omitempty"`

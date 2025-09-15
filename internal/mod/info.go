@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"encoding/json"
 	"fmt"
+	"io/fs"
 	"net/http"
 	"net/url"
 	"os"
@@ -18,23 +19,21 @@ import (
 type Info struct {
 	Path string `json:"-"`
 
-	Type    Type   `json:"type"`
-	Name    string `json:"name"`
-	Version string `json:"version"`
-	ModID   string `json:"modid,omitempty"`
-
-	// TODO: fix unmarshal string bools
-	// NetworkVersion   string            `json:"networkVersion,omitempty"`
-	// TextureSize      int               `json:"textureSize,omitempty"`
-	// Description      string            `json:"description,omitempty"`
-	// Website          string            `json:"website,omitempty"`
-	// IconPath         string            `json:"iconPath,omitempty"`
-	// Authors          []string          `json:"authors,omitempty"`
-	// Contributors     []string          `json:"contributors,omitempty"`
-	// Side             AppSide           `json:"side,omitempty"`
-	// RequiredOnClient bool              `json:"requiredOnClient,omitempty"`
-	// RequiredOnServer bool              `json:"requiredOnServer,omitempty"`
-	// Dependencies     map[string]string `json:"dependencies,omitempty"`
+	Type             Type              `json:"type"`
+	Name             string            `json:"name"`
+	ModID            string            `json:"modid,omitempty"`
+	Version          string            `json:"version"`
+	NetworkVersion   string            `json:"networkVersion,omitempty"`
+	TextureSize      int               `json:"textureSize,omitempty"`
+	Description      string            `json:"description,omitempty"`
+	Website          string            `json:"website,omitempty"`
+	IconPath         string            `json:"iconPath,omitempty"`
+	Authors          []string          `json:"authors,omitempty"`
+	Contributors     []string          `json:"contributors,omitempty"`
+	Side             AppSide           `json:"side,omitempty"`
+	RequiredOnClient Bool              `json:"requiredOnClient,omitempty"`
+	RequiredOnServer Bool              `json:"requiredOnServer,omitempty"`
+	Dependencies     map[string]string `json:"dependencies,omitempty"`
 }
 
 func InfoFromZip(path string) (*Info, error) {
@@ -59,13 +58,45 @@ func InfoFromZip(path string) (*Info, error) {
 	return nil, fmt.Errorf("mod.InfoFromZip: no files found in %s", path)
 }
 
+func InfoFromPath(path string) ([]*Info, error) {
+	mods := []*Info{}
+	err := filepath.WalkDir(config.ModPath, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if d.IsDir() {
+			if path == config.ModPath {
+				return nil
+			}
+			return fs.SkipDir
+		}
+
+		name := d.Name()
+		if filepath.Ext(name) != ".zip" {
+			return nil
+		}
+
+		info, err := InfoFromZip(path)
+		if err != nil {
+			return err
+		}
+		mods = append(mods, info)
+		return nil
+	})
+	return mods, err
+}
+
 func (i *Info) String() string {
 	return i.Name + "@" + i.Version
 }
 
 // CheckUpdates returns url to latest mod version
 func (i *Info) CheckUpdates() (Update, error) {
-	// TODO: Fix search when ModID is missing
+	if i.ModID == "" {
+		return Update{}, ErrNoModID
+	}
+
 	uri, err := url.JoinPath("https://mods.vintagestory.at/api/mod/", i.ModID)
 	if err != nil {
 		return Update{}, fmt.Errorf("Info.CheckUpdates: %w", err)
@@ -84,6 +115,7 @@ func (i *Info) CheckUpdates() (Update, error) {
 	}
 
 	for _, release := range r.Mod.Releases {
+		fmt.Println(release.ModVersion > i.Version, release.ModVersion, i.Version)
 		if release.ModVersion > i.Version {
 			return Update{
 				URL:      release.Mainfile,

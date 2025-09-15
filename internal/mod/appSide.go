@@ -14,11 +14,11 @@ const (
 func (a *AppSide) MarshalJSON() ([]byte, error) {
 	switch *a {
 	case Server:
-		return []byte("Server"), nil
+		return []byte(`"Server"`), nil
 	case Client:
-		return []byte("Client"), nil
+		return []byte(`"Client"`), nil
 	default:
-		return []byte("Universal"), nil
+		return []byte(`"Universal"`), nil
 	}
 }
 

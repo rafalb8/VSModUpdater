@@ -17,11 +17,11 @@ const (
 func (t *Type) MarshalJSON() ([]byte, error) {
 	switch *t {
 	case Theme:
-		return []byte("theme"), nil
+		return []byte(`"theme"`), nil
 	case Content:
-		return []byte("content"), nil
+		return []byte(`"content"`), nil
 	case Code:
-		return []byte("code"), nil
+		return []byte(`"code"`), nil
 	default:
 		return nil, fmt.Errorf("mod.Type: unknown type: %v", t)
 	}

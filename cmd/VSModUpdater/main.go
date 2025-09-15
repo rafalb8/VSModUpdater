@@ -3,9 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io/fs"
 	"os"
-	"path/filepath"
+	"strings"
+	"time"
 
 	"github.com/rafalb8/VSModUpdater/internal/config"
 	"github.com/rafalb8/VSModUpdater/internal/mod"
@@ -27,33 +27,10 @@ func main() {
 		return
 	}
 
-	mods := []*mod.Info{}
-	err := filepath.WalkDir(config.ModPath, func(path string, d fs.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-
-		if d.IsDir() {
-			if path == config.ModPath {
-				return nil
-			}
-			return fs.SkipDir
-		}
-
-		name := d.Name()
-		if filepath.Ext(name) != ".zip" {
-			return nil
-		}
-
-		info, err := mod.InfoFromZip(path)
-		if err != nil {
-			return err
-		}
-		mods = append(mods, info)
-		return nil
-	})
+	mods, err := mod.InfoFromPath(config.ModPath)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		return
 	}
 
 	if len(mods) == 0 {
@@ -61,15 +38,45 @@ func main() {
 		return
 	}
 
+	if config.List {
+		List(mods)
+	} else {
+		Update(mods)
+	}
+}
+
+func List(mods []*mod.Info) {
+	sep := strings.Repeat("=", 80)
+	for _, m := range mods {
+		fmt.Println(sep)
+		fmt.Println("Name:\t\t", m.Name)
+		fmt.Println("Version:\t", m.Version)
+		gameVer, ok := m.Dependencies["game"]
+		if ok {
+			if gameVer == "*" {
+				gameVer = "any"
+			}
+			fmt.Println("Game Version:\t", gameVer)
+		}
+		fmt.Println("Authors:\t", strings.Join(m.Authors, ", "))
+		fmt.Println("Description:\t", m.Description)
+	}
+	fmt.Println(sep)
+}
+
+func Update(mods []*mod.Info) {
 	for _, m := range mods {
 		update, err := m.CheckUpdates()
-		if err == mod.ErrNoUpdate {
+		switch {
+		case err == mod.ErrNoUpdate:
 			fmt.Println(m, "- SKIP")
 			continue
-		}
-
-		if err != nil {
-			panic(err)
+		case err == mod.ErrNoModID:
+			fmt.Println(m, "- Missing ModID")
+			continue
+		case err != nil:
+			fmt.Println(err)
+			return
 		}
 
 		fmt.Printf("Downloading %s: %s => %s - ", m.Name, m.Version, update.Version)
@@ -96,4 +103,7 @@ func main() {
 		}
 		fmt.Println("SUCCESS")
 	}
+
+	fmt.Println("DONE")
+	time.Sleep(3 * time.Second)
 }

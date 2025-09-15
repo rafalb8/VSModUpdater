@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strings"
 
 	"github.com/rafalb8/VSModUpdater/internal/config"
 	"github.com/rafalb8/VSModUpdater/internal/mod"
@@ -23,19 +24,18 @@ func Update() error {
 
 	selfInfo := mod.Info{
 		ModID:   "5060",
-		Version: config.VersionNum,
+		Version: strings.TrimPrefix(config.VersionNum, "v"),
 	}
 
 	fmt.Println("checking for update...")
 	update, err := selfInfo.CheckUpdates()
+	if err == mod.ErrNoUpdate {
+		return err
+	}
 	if err != nil {
 		return fmt.Errorf("failed to check for update: %w", err)
 	}
 
-	if update.Version < config.VersionNum {
-		fmt.Println("you are using current version")
-		return nil
-	}
 	fmt.Printf("update found, old: %s, new: %s\n", config.VersionNum, update.Version)
 
 	backupLocation := fmt.Sprintf("%s.bak", selfLocation)
