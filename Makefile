@@ -10,9 +10,12 @@ release: all
 linux:
 	CGO_ENABLED=0 \
 	GOOS=linux \
-	go build -ldflags='-s -w' -o result/VSModUpdater ./cmd/VSModUpdater
+	go build -ldflags="-s -w -X 'github.com/rafalb8/VSModUpdater/internal/config.VersionNum=$(TAG)'" \
+	-o result/VSModUpdater ./cmd/VSModUpdater
 
 windows:
 	CGO_ENABLED=0 \
 	GOOS=windows \
-	go build -ldflags='-s -w' -o result/VSModUpdater.exe ./cmd/VSModUpdater
+	go build -ldflags="-s -w -X 'github.com/rafalb8/VSModUpdater/internal/config.VersionNum=$(TAG)'" \
+	-o result/VSModUpdater.exe ./cmd/VSModUpdater
+

@@ -9,10 +9,23 @@ import (
 
 	"github.com/rafalb8/VSModUpdater/internal/config"
 	"github.com/rafalb8/VSModUpdater/internal/mod"
+	"github.com/rafalb8/VSModUpdater/internal/self"
 )
 
 func main() {
 	flag.Parse()
+	if config.Version {
+		fmt.Println(config.VersionNum)
+		return
+	}
+
+	if config.Self {
+		err := self.Update()
+		if err != nil {
+			fmt.Println(err)
+		}
+		return
+	}
 
 	mods := []*mod.Info{}
 	err := filepath.WalkDir(config.ModPath, func(path string, d fs.DirEntry, err error) error {
@@ -39,7 +52,6 @@ func main() {
 		mods = append(mods, info)
 		return nil
 	})
-
 	if err != nil {
 		panic(err)
 	}

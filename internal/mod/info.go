@@ -98,7 +98,7 @@ func (i *Info) CheckUpdates() (Update, error) {
 }
 
 func (i *Info) Backup() error {
-	err := os.MkdirAll(config.BackupPath, 0755)
+	err := os.MkdirAll(config.BackupPath, 0o755)
 	if err != nil {
 		return err
 	}

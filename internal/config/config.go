@@ -8,11 +8,15 @@ import (
 
 var ConfigPath string
 
+var VersionNum string = "dev"
+
 // Flags
 var (
 	BackupPath string
 	ModPath    string
 	Backup     bool
+	Self       bool
+	Version    bool
 )
 
 func init() {
@@ -26,4 +30,6 @@ func init() {
 	flag.StringVar(&ModPath, "modPath", filepath.Join(ConfigPath, "Mods"), "path to VS mod directory")
 	flag.StringVar(&BackupPath, "backupPath", filepath.Join(ConfigPath, "ModBackups"), "path to VS mod backup directory")
 	flag.BoolVar(&Backup, "backup", false, "backup mods instead of removing them")
+	flag.BoolVar(&Self, "self", false, "update VSModUpdater")
+	flag.BoolVar(&Version, "version", false, "print version")
 }
