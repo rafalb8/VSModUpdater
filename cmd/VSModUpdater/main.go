@@ -16,10 +16,7 @@ func main() {
 		fmt.Println(config.VersionNum)
 
 	case config.Self:
-		err := modes.Self()
-		if err != nil {
-			fmt.Println(err)
-		}
+		modes.Self()
 
 	case config.List:
 		modes.List()

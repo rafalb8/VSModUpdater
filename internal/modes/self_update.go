@@ -16,112 +16,118 @@ import (
 	"github.com/rafalb8/VSModUpdater/internal/mod"
 )
 
-func Self() error {
-	selfLocation, err := os.Executable()
+func Self() {
+	selfPath, err := os.Executable()
 	if err != nil {
-		return fmt.Errorf("failed to get self location: %w", err)
+		fmt.Println("Failed to get self location:", err)
+		return
 	}
 
-	selfInfo := mod.Info{
+	m := mod.Info{
 		ModID:   "5060",
 		Version: strings.TrimPrefix(config.VersionNum, "v"),
 	}
 
-	fmt.Println("checking for update...")
-	update, err := selfInfo.CheckUpdates()
+	fmt.Print("Checking for update - ")
+	update, err := m.CheckUpdates()
 	if err == mod.ErrNoUpdate {
-		return err
+		fmt.Println("SUCCESS")
+		fmt.Println("No updates")
+		return
 	}
 	if err != nil {
-		return fmt.Errorf("failed to check for update: %w", err)
+		fmt.Println("FAIL")
+		fmt.Println(err)
+		return
 	}
+	fmt.Println("SUCCESS")
 
-	fmt.Printf("update found, old: %s, new: %s\n", config.VersionNum, update.Version)
-
-	backupLocation := fmt.Sprintf("%s.bak", selfLocation)
-	fmt.Println("backing up old version to:", backupLocation)
-	err = os.Rename(selfLocation, backupLocation)
-	if err != nil {
-		return fmt.Errorf("failed to rename old version: %w", err)
-	}
-	defer func() {
-		if err != nil {
-			err = os.Rename(backupLocation, selfLocation)
-			if err != nil {
-				fmt.Printf("failed to undo renaming of '%s', please remove '.bak' manualy", selfLocation)
-			}
-			return
-		}
-		// remove old on success
-		fmt.Println("removing old", backupLocation)
-		os.Remove(backupLocation)
-	}()
-
-	fmt.Println("downloading new version...")
+	fmt.Printf("Downloading: %s => %s - ", m.Version, update.Version)
 	resp, err := http.Get(update.URL)
 	if err != nil {
-		return err
+		fmt.Println("FAIL")
+		fmt.Println(err)
+		return
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("DownloadFile: status: %s", resp.Status)
+		fmt.Println("FAIL")
+		fmt.Println("HTTP status:", resp.Status)
+		return
 	}
+	fmt.Println("SUCCESS")
 
-	b, err := io.ReadAll(resp.Body)
+	fmt.Print("Unzipping - ")
+	buf, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return err
+		fmt.Println("FAIL")
+		fmt.Println(err)
+		return
 	}
 
-	zipReader, err := zip.NewReader(bytes.NewReader(b), resp.ContentLength)
+	zipReader, err := zip.NewReader(bytes.NewReader(buf), resp.ContentLength)
 	if err != nil {
-		return err
+		fmt.Println("FAIL")
+		fmt.Println(err)
+		return
 	}
 
-	var f *zip.File
+	var f io.ReadCloser
+	var ext string
 	for _, file := range zipReader.File {
-		switch runtime.GOOS {
-		case "linux":
-			if filepath.Ext(file.Name) == "" {
-				f = file
-			}
-		case "windows":
-			if filepath.Ext(file.Name) == "exe" {
-				f = file
-			}
+		ext = filepath.Ext(file.Name)
+		if runtime.GOOS == "linux" && ext == "" {
+			f, err = file.Open()
+			break
+		} else if runtime.GOOS == "windows" && ext == ".exe" {
+			f, err = file.Open()
+			break
 		}
 	}
-
-	newSelf, err := os.Create(selfLocation)
 	if err != nil {
-		return fmt.Errorf("failed to update self: %w", err)
+		fmt.Println("FAIL")
+		fmt.Println(err)
+		return
 	}
 
-	zipFile, err := f.Open()
+	basename := filepath.Base(selfPath)
+	newName := fmt.Sprintf("%s_v%s%s", basename[:len(basename)-len(ext)], update.Version, ext)
+	newPath := filepath.Join(filepath.Dir(selfPath), newName)
+
+	newSelf, err := os.OpenFile(newPath, os.O_CREATE|os.O_WRONLY, 0o755)
 	if err != nil {
-		return fmt.Errorf("failed to update self: %w", err)
+		fmt.Println("FAIL")
+		fmt.Println(err)
+		return
 	}
 
-	_, err = newSelf.ReadFrom(zipFile)
+	_, err = newSelf.ReadFrom(f)
 	if err != nil {
-		return fmt.Errorf("failed to update self: %w", err)
+		fmt.Println("FAIL")
+		fmt.Println(err)
+		return
 	}
 
-	err = newSelf.Chmod(0o755)
-	if err != nil {
-		return fmt.Errorf("failed to update self: %w", err)
-	}
 	newSelf.Close()
+	fmt.Println("SUCCESS")
 
-	fmt.Println("testing new version...")
-	fmt.Printf("running `%s --help`\n\n", selfLocation)
-	cmd := exec.Command(selfLocation, "--help")
-	out, err := cmd.CombinedOutput()
+	fmt.Print("Testing new version - ")
+	cmd := exec.Command(newPath, "--help")
+	err = cmd.Run()
 	if err != nil {
-		return fmt.Errorf("failed to test self: %w", err)
+		fmt.Println("FAIL")
+		fmt.Println(err)
+		return
 	}
+	fmt.Println("SUCCESS")
 
-	fmt.Println(string(out))
-
-	return nil
+	fmt.Printf("Replacing %s => %s - ", filepath.Base(newPath), filepath.Base(selfPath))
+	err = os.Rename(newPath, selfPath)
+	if err != nil {
+		fmt.Println("FAIL")
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("SUCCESS")
 }
