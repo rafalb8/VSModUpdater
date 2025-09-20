@@ -4,6 +4,8 @@ import (
 	"flag"
 	"os"
 	"path/filepath"
+	"runtime"
+	"strings"
 )
 
 var ConfigPath string
@@ -14,10 +16,16 @@ var VersionNum string = "dev"
 var (
 	BackupPath string
 	ModPath    string
+	Excluded   []string
 	Backup     bool
-	Self       bool
-	Version    bool
-	List       bool
+)
+
+// Modes
+var (
+	Version     bool
+	Self        bool
+	List        bool
+	Interactive bool
 )
 
 func init() {
@@ -28,10 +36,18 @@ func init() {
 	}
 	ConfigPath = filepath.Join(ConfigPath, "VintagestoryData")
 
+	// Flags
 	flag.StringVar(&ModPath, "modPath", filepath.Join(ConfigPath, "Mods"), "path to VS mod directory")
 	flag.StringVar(&BackupPath, "backupPath", filepath.Join(ConfigPath, "ModBackups"), "path to VS mod backup directory")
 	flag.BoolVar(&Backup, "backup", false, "backup mods instead of removing them")
+	flag.Func("exclude", "disable updates: modID1,modID2,...", func(s string) error {
+		Excluded = strings.Split(s, ",")
+		return nil
+	})
+
+	// Modes
 	flag.BoolVar(&Self, "self", false, "update VSModUpdater")
 	flag.BoolVar(&Version, "version", false, "print version")
 	flag.BoolVar(&List, "list", false, "list mods")
+	flag.BoolVar(&Interactive, "interactive", runtime.GOOS == "windows", "interactive update mode")
 }

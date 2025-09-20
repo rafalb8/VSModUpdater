@@ -8,7 +8,7 @@ import (
 	"github.com/rafalb8/VSModUpdater/internal/mod"
 )
 
-func Update() {
+func Interactive() {
 	mods, err := mod.InfoFromPath(config.ModPath)
 	if err != nil {
 		fmt.Println(err)
@@ -32,6 +32,14 @@ func Update() {
 		case err != nil:
 			fmt.Println(err)
 			return
+		}
+
+		shouldUpdate := ""
+		fmt.Printf("Update %s: %s => %s? [Y/n] ", m.Name, m.Version, update.Version)
+		fmt.Scanf("%s", &shouldUpdate)
+		if len(shouldUpdate) > 0 && shouldUpdate[0]|' ' == 'n' {
+			fmt.Println(m, "- SKIP")
+			continue
 		}
 
 		fmt.Printf("Downloading %s: %s => %s - ", m.Name, m.Version, update.Version)
@@ -59,5 +67,7 @@ func Update() {
 		fmt.Println("SUCCESS")
 	}
 
-	fmt.Println("DONE")
+	fmt.Println("Finished Updating.")
+	fmt.Print("Press any key ")
+	fmt.Scanln()
 }
