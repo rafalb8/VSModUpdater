@@ -16,7 +16,7 @@ var VersionNum string = "dev"
 var (
 	BackupPath string
 	ModPath    string
-	Excluded   []string
+	Ignored    map[string]struct{}
 	Backup     bool
 )
 
@@ -40,8 +40,12 @@ func init() {
 	flag.StringVar(&ModPath, "modPath", filepath.Join(ConfigPath, "Mods"), "path to VS mod directory")
 	flag.StringVar(&BackupPath, "backupPath", filepath.Join(ConfigPath, "ModBackups"), "path to VS mod backup directory")
 	flag.BoolVar(&Backup, "backup", false, "backup mods instead of removing them")
-	flag.Func("exclude", "disable updates: modID1,modID2,...", func(s string) error {
-		Excluded = strings.Split(s, ",")
+	flag.Func("ignore", "disable updates: modID1,modID2,...", func(s string) error {
+		mods := strings.Split(s, ",")
+		Ignored = make(map[string]struct{}, len(mods))
+		for _, modID := range mods {
+			Ignored[modID] = struct{}{}
+		}
 		return nil
 	})
 

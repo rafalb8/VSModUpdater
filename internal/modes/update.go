@@ -21,10 +21,15 @@ func Update(interactive bool) {
 	}
 
 	for _, m := range mods {
+		if _, ignored := config.Ignored[m.ModID]; ignored {
+			fmt.Println(m, "- Ignore")
+			continue
+		}
+
 		update, err := m.CheckUpdates()
 		switch {
 		case err == mod.ErrNoUpdate:
-			fmt.Println(m, "- SKIP")
+			fmt.Println(m, "- Skip")
 			continue
 		case err == mod.ErrNoModID:
 			fmt.Println(m, "- Missing ModID")
