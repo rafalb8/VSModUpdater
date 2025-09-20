@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/rafalb8/VSModUpdater/internal/config"
 )
@@ -89,6 +90,23 @@ func InfoFromPath(path string) ([]*Info, error) {
 
 func (i *Info) String() string {
 	return i.Name + "@" + i.Version
+}
+
+// Details returns detailed mod info string
+func (i *Info) Details() string {
+	sb := strings.Builder{}
+	sb.WriteString("Name:\t\t" + i.Name + "\n")
+	sb.WriteString("Version:\t" + i.Version + "\n")
+	gameVer, ok := i.Dependencies["game"]
+	if ok {
+		if gameVer == "*" {
+			gameVer = "any"
+		}
+		sb.WriteString("Game Version:\t" + gameVer + "\n")
+	}
+	sb.WriteString("Authors:\t" + strings.Join(i.Authors, ", ") + "\n")
+	sb.WriteString("Description:\t" + i.Description)
+	return sb.String()
 }
 
 // CheckUpdates returns url to latest mod version

@@ -1,4 +1,4 @@
-package self
+package modes
 
 import (
 	"archive/zip"
@@ -16,7 +16,7 @@ import (
 	"github.com/rafalb8/VSModUpdater/internal/mod"
 )
 
-func Update() error {
+func Self() error {
 	selfLocation, err := os.Executable()
 	if err != nil {
 		return fmt.Errorf("failed to get self location: %w", err)
