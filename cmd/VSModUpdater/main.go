@@ -22,9 +22,9 @@ func main() {
 		modes.List()
 
 	case config.Interactive && len(config.Excluded) == 0:
-		modes.Interactive()
+		modes.Update(true)
 
 	default:
-		modes.Update()
+		modes.Update(false)
 	}
 }
