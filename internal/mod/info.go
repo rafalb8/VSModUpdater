@@ -96,6 +96,7 @@ func (i *Info) String() string {
 func (i *Info) Details() string {
 	sb := strings.Builder{}
 	sb.WriteString("Name:\t\t" + i.Name + "\n")
+	sb.WriteString("ModID:\t\t" + i.ModID + "\n")
 	sb.WriteString("Version:\t" + i.Version + "\n")
 	gameVer, ok := i.Dependencies["game"]
 	if ok {
