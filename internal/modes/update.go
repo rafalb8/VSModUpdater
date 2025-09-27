@@ -9,6 +9,14 @@ import (
 )
 
 func Update(interactive bool) {
+	if interactive {
+		defer func() {
+			fmt.Print("Press any key ")
+			fmt.Scanln()
+		}()
+	}
+
+	fmt.Println("Updating mods:", config.ModPath)
 	mods, err := mod.InfoFromPath(config.ModPath)
 	if err != nil {
 		fmt.Println(err)
@@ -75,8 +83,4 @@ func Update(interactive bool) {
 	}
 
 	fmt.Println("Finished Updating.")
-	if interactive {
-		fmt.Print("Press any key ")
-		fmt.Scanln()
-	}
 }
