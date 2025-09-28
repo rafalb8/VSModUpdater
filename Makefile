@@ -1,4 +1,5 @@
 TAG ?= v0.0.0
+LDFLAGS = "-s -w -X 'github.com/rafalb8/VSModUpdater/internal/config.VersionNum=$(TAG)'"
 
 all: linux windows
 
@@ -10,12 +11,10 @@ release: all
 linux:
 	CGO_ENABLED=0 \
 	GOOS=linux \
-	go build -ldflags="-s -w -X 'github.com/rafalb8/VSModUpdater/internal/config.VersionNum=$(TAG)'" \
-	-o result/VSModUpdater ./cmd/VSModUpdater
+	go build -ldflags=$(LDFLAGS) -o result/VSModUpdater ./cmd/VSModUpdater
 
 windows:
 	CGO_ENABLED=0 \
 	GOOS=windows \
-	go build -ldflags="-s -w -X 'github.com/rafalb8/VSModUpdater/internal/config.VersionNum=$(TAG)'" \
-	-o result/VSModUpdater.exe ./cmd/VSModUpdater
+	go build -ldflags=$(LDFLAGS) -o result/VSModUpdater.exe ./cmd/VSModUpdater
 

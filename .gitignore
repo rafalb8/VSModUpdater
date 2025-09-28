@@ -1,1 +1,5 @@
 /result
+
+/pkg
+/*.pkg*
+/VSModUpdater
