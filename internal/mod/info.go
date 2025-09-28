@@ -18,7 +18,8 @@ import (
 //   - [Wiki](https://wiki.vintagestory.at/Modding:Modinfo)
 //   - [Docs](https://apidocs.vintagestory.at/api/Vintagestory.API.Common.Info.html)
 type Info struct {
-	Path string `json:"-"`
+	Path  string `json:"-"`
+	Error error  `json:"-"`
 
 	Type             Type              `json:"type"`
 	Name             string            `json:"name"`
@@ -80,7 +81,7 @@ func InfoFromPath(path string) ([]*Info, error) {
 
 		info, err := InfoFromZip(path)
 		if err != nil {
-			return err
+			info = &Info{Path: path, Error: err}
 		}
 		mods = append(mods, info)
 		return nil
@@ -95,6 +96,12 @@ func (i *Info) String() string {
 // Details returns detailed mod info string
 func (i *Info) Details() string {
 	sb := strings.Builder{}
+	if i.Error != nil {
+		sb.WriteString("File:\t\t" + filepath.Base(i.Path) + "\n")
+		sb.WriteString("Error:\t\t" + i.Error.Error())
+		return sb.String()
+	}
+
 	sb.WriteString("Name:\t\t" + i.Name + "\n")
 	sb.WriteString("ModID:\t\t" + i.ModID + "\n")
 	sb.WriteString("Version:\t" + i.Version + "\n")

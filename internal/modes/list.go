@@ -23,6 +23,14 @@ func List() {
 	sep := strings.Repeat("=", 80)
 	for _, m := range mods {
 		fmt.Println(sep)
+
+		if m.Error != nil {
+			fmt.Print("\033[0;31m") // Red
+			fmt.Println(m.Details())
+			fmt.Print("\033[0m") // Reset
+			continue
+		}
+
 		fmt.Println(m.Details())
 	}
 	fmt.Println(sep)

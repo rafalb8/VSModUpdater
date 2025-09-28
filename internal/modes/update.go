@@ -3,6 +3,7 @@ package modes
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/rafalb8/VSModUpdater/internal/config"
 	"github.com/rafalb8/VSModUpdater/internal/mod"
@@ -31,6 +32,13 @@ func Update(interactive bool) {
 	for _, m := range mods {
 		if _, ignored := config.Ignored[m.ModID]; ignored {
 			fmt.Println(m, "- Ignore")
+			continue
+		}
+
+		if m.Error != nil {
+			fmt.Print("\033[0;31m") // Red
+			fmt.Println("!!!", filepath.Base(m.Path), "- Failed:", m.Error)
+			fmt.Print("\033[0m") // Reset
 			continue
 		}
 
