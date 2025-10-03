@@ -9,8 +9,8 @@ import (
 	"github.com/rafalb8/VSModUpdater/internal/mod"
 )
 
-func Update(interactive bool) {
-	if interactive {
+func Update() {
+	if config.Interactive {
 		defer func() {
 			fmt.Print("Press any key ")
 			fmt.Scanln()
@@ -55,7 +55,12 @@ func Update(interactive bool) {
 			return
 		}
 
-		if interactive {
+		if config.DryRun {
+			fmt.Printf("%s - Update v%s found!\n", m, update.Version)
+			continue
+		}
+
+		if config.Interactive {
 			shouldUpdate := ""
 			fmt.Printf("Update %s: %s => %s? [Y/n] ", m.Name, m.Version, update.Version)
 			fmt.Scanf("%s", &shouldUpdate)

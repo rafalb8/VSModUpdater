@@ -21,10 +21,7 @@ func main() {
 	case config.List:
 		modes.List()
 
-	case config.Interactive:
-		modes.Update(true)
-
 	default:
-		modes.Update(false)
+		modes.Update()
 	}
 }

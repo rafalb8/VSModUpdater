@@ -8,38 +8,38 @@ import (
 	"strings"
 )
 
-var ConfigPath string
-
 var VersionNum string = "v0.0.0"
 
 // Flags
 var (
-	BackupPath string
-	ModPath    string
-	Ignored    map[string]struct{}
-	Backup     bool
+	ModPath     string
+	BackupPath  string
+	DryRun      bool
+	Backup      bool
+	Interactive bool
+	Ignored     map[string]struct{}
 )
 
 // Modes
 var (
-	Version     bool
-	Self        bool
-	List        bool
-	Interactive bool
+	Version bool
+	Self    bool
+	List    bool
 )
 
 func init() {
-	var err error
-	ConfigPath, err = os.UserConfigDir()
+	cfgPath, err := os.UserConfigDir()
 	if err != nil {
 		panic(err)
 	}
-	ConfigPath = filepath.Join(ConfigPath, "VintagestoryData")
+	cfgPath = filepath.Join(cfgPath, "VintagestoryData")
 
 	// Flags
-	flag.StringVar(&ModPath, "modPath", filepath.Join(ConfigPath, "Mods"), "path to VS mod directory")
-	flag.StringVar(&BackupPath, "backupPath", filepath.Join(ConfigPath, "ModBackups"), "path to VS mod backup directory")
+	flag.StringVar(&ModPath, "modPath", filepath.Join(cfgPath, "Mods"), "path to VS mod directory")
+	flag.StringVar(&BackupPath, "backupPath", filepath.Join(cfgPath, "ModBackups"), "path to VS mod backup directory")
+	flag.BoolVar(&DryRun, "dry-run", false, "run the updater without actually doing anything")
 	flag.BoolVar(&Backup, "backup", false, "backup mods instead of removing them")
+	flag.BoolVar(&Interactive, "interactive", runtime.GOOS == "windows", "interactive update mode")
 	flag.Func("ignore", "disable updates: modID1,modID2,...", func(s string) error {
 		mods := strings.Split(s, ",")
 		Ignored = make(map[string]struct{}, len(mods))
@@ -53,5 +53,4 @@ func init() {
 	flag.BoolVar(&Self, "self", false, "update VSModUpdater")
 	flag.BoolVar(&Version, "version", false, "print version")
 	flag.BoolVar(&List, "list", false, "list mods")
-	flag.BoolVar(&Interactive, "interactive", runtime.GOOS == "windows", "interactive update mode")
 }
