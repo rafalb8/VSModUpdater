@@ -35,8 +35,8 @@ func init() {
 	cfgPath = filepath.Join(cfgPath, "VintagestoryData")
 
 	// Flags
-	flag.StringVar(&ModPath, "modPath", filepath.Join(cfgPath, "Mods"), "path to VS mod directory")
-	flag.StringVar(&BackupPath, "backupPath", filepath.Join(cfgPath, "ModBackups"), "path to VS mod backup directory")
+	flag.StringVar(&ModPath, "mod-path", filepath.Join(cfgPath, "Mods"), "path to VS mod directory")
+	flag.StringVar(&BackupPath, "backup-path", filepath.Join(cfgPath, "ModBackups"), "path to VS mod backup directory")
 	flag.BoolVar(&DryRun, "dry-run", false, "run the updater without actually doing anything")
 	flag.BoolVar(&Backup, "backup", false, "backup mods instead of removing them")
 	flag.BoolVar(&Interactive, "interactive", runtime.GOOS == "windows", "interactive update mode")
