@@ -10,7 +10,7 @@ import (
 
 var ConfigPath string
 
-var VersionNum string = "dev"
+var VersionNum string = "v0.0.0"
 
 // Flags
 var (
