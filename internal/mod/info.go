@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/fs"
 	"net/http"
 	"net/url"
@@ -12,6 +13,7 @@ import (
 	"strings"
 
 	"github.com/rafalb8/VSModUpdater/internal/config"
+	"github.com/tailscale/hujson"
 )
 
 // Info contains mod metadata
@@ -49,13 +51,28 @@ func InfoFromZip(path string) (*Info, error) {
 		if f.Name != "modinfo.json" {
 			continue
 		}
+
 		fr, err := f.Open()
+		if err != nil {
+			return nil, err
+		}
+		defer fr.Close()
+
+		data, err := io.ReadAll(fr)
+		if err != nil {
+			return nil, err
+		}
+
+		// Workaround for non-compliant JSON:
+		// Stripping trailing commas here, as a few mods continue
+		// to adhere to a looser standard than the parser.
+		data, err = hujson.Standardize(data)
 		if err != nil {
 			return nil, err
 		}
 
 		info := &Info{Path: path}
-		return info, json.NewDecoder(fr).Decode(info)
+		return info, json.Unmarshal(data, info)
 	}
 	return nil, fmt.Errorf("mod.InfoFromZip: no files found in %s", path)
 }
@@ -90,7 +107,12 @@ func InfoFromPath(path string) ([]*Info, error) {
 }
 
 func (i *Info) String() string {
-	return i.Name + "@" + i.Version
+	if i.Name == "" {
+		// Fallback to extracting name from file path
+		name := filepath.Base(i.Path)
+		return name[:len(name)-len(filepath.Ext(name))]
+	}
+	return i.Name + "@v" + i.Version
 }
 
 // Details returns detailed mod info string
