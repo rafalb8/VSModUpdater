@@ -9,7 +9,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"runtime"
 	"strings"
 
 	"github.com/rafalb8/VSModUpdater/internal/config"
@@ -73,18 +72,7 @@ func Self() {
 		return
 	}
 
-	var f io.ReadCloser
-	var ext string
-	for _, file := range zipReader.File {
-		ext = filepath.Ext(file.Name)
-		if runtime.GOOS == "linux" && ext == "" {
-			f, err = file.Open()
-			break
-		} else if runtime.GOOS == "windows" && ext == ".exe" {
-			f, err = file.Open()
-			break
-		}
-	}
+	f, err := getFile(zipReader)
 	if err != nil {
 		fmt.Println("FAIL")
 		fmt.Println(err)
@@ -92,6 +80,7 @@ func Self() {
 	}
 
 	basename := filepath.Base(selfPath)
+	ext := filepath.Ext(basename)
 	newName := fmt.Sprintf("%s_v%s%s", basename[:len(basename)-len(ext)], update.Version, ext)
 	newPath := filepath.Join(filepath.Dir(selfPath), newName)
 
