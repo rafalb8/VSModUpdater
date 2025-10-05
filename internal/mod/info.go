@@ -2,6 +2,7 @@ package mod
 
 import (
 	"archive/zip"
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -62,6 +63,10 @@ func InfoFromZip(path string) (*Info, error) {
 		if err != nil {
 			return nil, err
 		}
+
+		// Sometimes some editors add BOM (Byte Order Mark) to signal endianess.
+		// hujson doesn't like that.
+		data = bytes.TrimPrefix(data, []byte("\ufeff"))
 
 		// Workaround for non-compliant JSON:
 		// Stripping trailing commas here, as a few mods continue
