@@ -2,9 +2,11 @@
 Vintage Story Mod Updater - [ModDB](https://mods.vintagestory.at/modupdater)
 
 ## Installation
-The program is distributed as a [zip file](https://github.com/rafalb8/VSModUpdater/releases) containing two executable files:
+The program is distributed as a [zip file](https://github.com/rafalb8/VSModUpdater/releases) containing three executable files:
 * VSModUpdater (for Linux)
 * VSModUpdater.exe (for Windows)
+* VSModUpdater_macOS (macOS Universal Binary)
+
 
 Simply download the zip file, extract the contents, and run the appropriate executable for your operating system.
 
