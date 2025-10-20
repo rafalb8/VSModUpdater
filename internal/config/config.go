@@ -39,7 +39,7 @@ func init() {
 	flag.StringVar(&BackupPath, "backup-path", filepath.Join(cfgPath, "ModBackups"), "path to VS mod backup directory")
 	flag.BoolVar(&DryRun, "dry-run", false, "run the updater without actually doing anything")
 	flag.BoolVar(&Backup, "backup", false, "backup mods instead of removing them")
-	flag.BoolVar(&Interactive, "interactive", runtime.GOOS == "windows", "interactive update mode")
+	flag.BoolVar(&Interactive, "interactive", runtime.GOOS != "linux", "interactive update mode")
 	flag.Func("ignore", "disable updates: modID1,modID2,...", func(s string) error {
 		mods := strings.Split(s, ",")
 		Ignored = make(map[string]struct{}, len(mods))
