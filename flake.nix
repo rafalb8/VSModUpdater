@@ -7,7 +7,7 @@
 
   outputs = { self, nixpkgs }:
     let
-      version = "v1.1.1";
+      version = "v1.1.2";
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
     in
