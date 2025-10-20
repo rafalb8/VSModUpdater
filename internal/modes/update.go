@@ -62,11 +62,22 @@ func Update() {
 
 		if config.Interactive {
 			shouldUpdate := ""
-			fmt.Printf("Update %s: %s => %s? [Y/n] ", m.Name, m.Version, update.Version)
+			fmt.Printf("Update %s: %s => %s? [Y/n/a] ", m.Name, m.Version, update.Version)
 			fmt.Scanf("%s", &shouldUpdate)
-			if len(shouldUpdate) > 0 && shouldUpdate[0]|' ' == 'n' {
-				fmt.Println(m, "- SKIP")
-				continue
+			if len(shouldUpdate) > 0 {
+				// normalize character
+				option := shouldUpdate[0] | ' '
+
+				if option == 'n' {
+					fmt.Println(m, "- SKIP")
+					continue
+				}
+
+				if option == 'a' {
+					// disable interactive mode
+					config.Interactive = false
+				}
+
 			}
 		}
 
