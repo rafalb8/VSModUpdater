@@ -1,10 +1,16 @@
 package mod
 
-import "errors"
+import (
+	"errors"
+	"strings"
+
+	"golang.org/x/mod/semver"
+)
 
 var (
-	ErrNoUpdate = errors.New("no update")
-	ErrNoModID  = errors.New("no modid")
+	ErrNoUpdate      = errors.New("no update")
+	ErrNoModID       = errors.New("no modid")
+	ErrInvalidSemVer = errors.New("mod version is not a valid Semantic Version. Expected format: MAJOR.MINOR.PATCH")
 )
 
 type Response struct {
@@ -20,7 +26,7 @@ type Releases struct {
 	Downloads  int      `json:"downloads,omitempty"`
 	Tags       []string `json:"tags,omitempty"`
 	ModIDStr   string   `json:"modidstr,omitempty"`
-	ModVersion string   `json:"modversion,omitempty"`
+	ModVersion SemVer   `json:"modversion,omitempty"`
 	Created    string   `json:"created,omitempty"`
 	Changelog  string   `json:"changelog,omitempty"`
 }
@@ -52,4 +58,26 @@ type Mod struct {
 	Tags            []string   `json:"tags,omitempty"`
 	Releases        []Releases `json:"releases,omitempty"`
 	Screenshots     []any      `json:"screenshots,omitempty"`
+}
+
+type SemVer string
+
+func (v *SemVer) UnmarshalJSON(data []byte) error {
+	x := string(data)
+	x = strings.Trim(x, `"`)
+
+	if x != "" && x[0] != 'v' {
+		x = "v" + x
+	}
+
+	if !semver.IsValid(x) {
+		return ErrInvalidSemVer
+	}
+
+	*v = SemVer(x)
+	return nil
+}
+
+func (v SemVer) Compare(x SemVer) int {
+	return semver.Compare(string(v), string(x))
 }

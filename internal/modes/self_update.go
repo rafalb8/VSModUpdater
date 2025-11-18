@@ -9,7 +9,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 
 	"github.com/rafalb8/VSModUpdater/internal/config"
 	"github.com/rafalb8/VSModUpdater/internal/mod"
@@ -24,7 +23,7 @@ func Self() {
 
 	m := mod.Info{
 		ModID:   "5060",
-		Version: strings.TrimPrefix(config.VersionNum, "v"),
+		Version: mod.SemVer(config.VersionNum),
 	}
 
 	fmt.Print("Checking for update - ")
@@ -81,7 +80,7 @@ func Self() {
 
 	basename := filepath.Base(selfPath)
 	ext := filepath.Ext(basename)
-	newName := fmt.Sprintf("%s_v%s%s", basename[:len(basename)-len(ext)], update.Version, ext)
+	newName := fmt.Sprintf("%s_%s%s", basename[:len(basename)-len(ext)], update.Version, ext)
 	newPath := filepath.Join(filepath.Dir(selfPath), newName)
 
 	newSelf, err := os.OpenFile(newPath, os.O_CREATE|os.O_WRONLY, 0o755)

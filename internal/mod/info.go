@@ -27,7 +27,7 @@ type Info struct {
 	Type             Type              `json:"type"`
 	Name             string            `json:"name"`
 	ModID            string            `json:"modid,omitempty"`
-	Version          string            `json:"version"`
+	Version          SemVer            `json:"version"`
 	NetworkVersion   string            `json:"networkVersion,omitempty"`
 	TextureSize      int               `json:"textureSize,omitempty"`
 	Description      string            `json:"description,omitempty"`
@@ -117,7 +117,7 @@ func (i *Info) String() string {
 		name := filepath.Base(i.Path)
 		return name[:len(name)-len(filepath.Ext(name))]
 	}
-	return i.Name + "@v" + i.Version
+	return i.Name + "@" + string(i.Version)
 }
 
 // Details returns detailed mod info string
@@ -131,10 +131,10 @@ func (i *Info) Details() string {
 
 	sb.WriteString("Name:\t\t" + i.Name + "\n")
 	sb.WriteString("ModID:\t\t" + i.ModID + "\n")
-	sb.WriteString("Version:\t" + i.Version + "\n")
+	sb.WriteString("Version:\t" + string(i.Version) + "\n")
 	gameVer, ok := i.Dependencies["game"]
 	if ok {
-		if gameVer == "*" {
+		if gameVer == "*" || gameVer == "" {
 			gameVer = "any"
 		}
 		sb.WriteString("Game Version:\t" + gameVer + "\n")
@@ -168,7 +168,7 @@ func (i *Info) CheckUpdates() (Update, error) {
 	}
 
 	for _, release := range r.Mod.Releases {
-		if release.ModVersion > i.Version {
+		if release.ModVersion.Compare(i.Version) > 0 {
 			return Update{
 				URL:      release.Mainfile,
 				Version:  release.ModVersion,

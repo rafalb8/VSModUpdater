@@ -12,7 +12,7 @@ import (
 
 type Update struct {
 	URL      string
-	Version  string
+	Version  SemVer
 	Filename string
 }
 
