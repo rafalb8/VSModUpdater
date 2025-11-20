@@ -41,7 +41,7 @@
 
       devShells.${system}.default = pkgs.mkShell {
         env.CGO_ENABLED = "0";
-        packages = with pkgs; [ go ];
+        packages = with pkgs; [ go zip ];
       };
     };
 }
