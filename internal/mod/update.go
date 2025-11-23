@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 
@@ -17,14 +18,22 @@ type Update struct {
 }
 
 func (upd Update) Download() error {
-	resp, err := http.Get(upd.URL)
+	req, err := http.NewRequest(http.MethodGet, upd.URL, nil)
+	if err != nil {
+		return err
+	}
+
+	// Make sure queries are escaped
+	req.URL.RawQuery = url.QueryEscape(req.URL.RawQuery)
+
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("DownloadFile: status: %s", resp.Status)
+		return fmt.Errorf("Download: status: %s", resp.Status)
 	}
 
 	out, err := os.Create(filepath.Join(config.ModPath, upd.Filename))
