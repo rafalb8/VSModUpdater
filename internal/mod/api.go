@@ -2,6 +2,7 @@ package mod
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"golang.org/x/mod/semver"
@@ -10,7 +11,8 @@ import (
 var (
 	ErrNoUpdate      = errors.New("no update")
 	ErrNoModID       = errors.New("no modid")
-	ErrInvalidSemVer = errors.New("mod version is not a valid Semantic Version. Expected format: MAJOR.MINOR.PATCH")
+	ErrInvalidSemVer = errors.New("is not a valid Semantic Version")
+	ErrPreReleaseSkip = errors.New("skipped pre-release version")
 )
 
 type Response struct {
@@ -71,7 +73,7 @@ func (v *SemVer) UnmarshalJSON(data []byte) error {
 	}
 
 	if !semver.IsValid(x) {
-		return ErrInvalidSemVer
+		return fmt.Errorf("SemVer: '%s' %w", x, ErrInvalidSemVer)
 	}
 
 	*v = SemVer(x)

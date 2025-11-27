@@ -43,16 +43,16 @@ func Update() {
 		}
 
 		update, err := m.CheckUpdates()
-		switch {
-		case err == mod.ErrNoUpdate:
+		switch err {
+		case nil:
+		case mod.ErrNoUpdate:
 			fmt.Println(m, "- Skip")
 			continue
-		case err == mod.ErrNoModID:
-			fmt.Println(m, "- Missing ModID")
+		case mod.ErrPreReleaseSkip:
+			fmt.Println(m, "- Pre-release version available")
+		default:
+			fmt.Println(m, "-", err)
 			continue
-		case err != nil:
-			fmt.Println(err)
-			return
 		}
 
 		if config.DryRun {
@@ -65,19 +65,12 @@ func Update() {
 			fmt.Printf("Update %s: %s => %s? [Y/n/a] ", m.Name, m.Version, update.Version)
 			fmt.Scanf("%s", &shouldUpdate)
 			if len(shouldUpdate) > 0 {
-				// normalize character
-				option := shouldUpdate[0] | ' '
-
-				if option == 'n' {
-					fmt.Println(m, "- SKIP")
+				switch shouldUpdate[0] | ' ' {
+				case 'n':
 					continue
-				}
-
-				if option == 'a' {
-					// disable interactive mode
+				case 'a':
 					config.Interactive = false
 				}
-
 			}
 		}
 

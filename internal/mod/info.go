@@ -146,9 +146,9 @@ func (i *Info) Details() string {
 }
 
 // CheckUpdates returns url to latest mod version
-func (i *Info) CheckUpdates() (Update, error) {
+func (i *Info) CheckUpdates() (upd Update, err error) {
 	if i.ModID == "" {
-		return Update{}, ErrNoModID
+		return upd, ErrNoModID
 	}
 
 	// true if the current version is a prerelease OR if the flag pre-release is set.
@@ -156,38 +156,38 @@ func (i *Info) CheckUpdates() (Update, error) {
 
 	uri, err := url.JoinPath("https://mods.vintagestory.at/api/mod/", i.ModID)
 	if err != nil {
-		return Update{}, fmt.Errorf("Info.CheckUpdates: %w", err)
+		return upd, fmt.Errorf("Info.CheckUpdates: %w", err)
 	}
 
 	resp, err := http.Get(uri)
 	if err != nil {
-		return Update{}, fmt.Errorf("Info.CheckUpdates: %w", err)
+		return upd, fmt.Errorf("Info.CheckUpdates: %w", err)
 	}
 	defer resp.Body.Close()
 
 	r := &Response{}
 	err = json.NewDecoder(resp.Body).Decode(r)
 	if err != nil {
-		return Update{}, fmt.Errorf("Info.CheckUpdates: %w", err)
+		return upd, fmt.Errorf("Info.CheckUpdates: %w", err)
 	}
 
 	for _, release := range r.Mod.Releases {
 		if !allowDev && release.ModVersion.PreRelease() {
 			// skip pre-release version
+			err = ErrPreReleaseSkip
 			continue
 		}
 
 		if release.ModVersion.Compare(i.Version) > 0 {
-			return Update{
-				URL:      release.Mainfile,
-				Version:  release.ModVersion,
-				Filename: release.Filename,
-			}, nil
-		} else {
-			return Update{}, ErrNoUpdate
+			upd.URL = release.Mainfile
+			upd.Version = release.ModVersion
+			upd.Filename = release.Filename
+			return
 		}
+
+		return upd, cmp.Or(err, ErrNoUpdate)
 	}
-	return Update{}, fmt.Errorf("Info.CheckUpdates: no release found for %s", i.ModID)
+	return upd, fmt.Errorf("Info.CheckUpdates: no release found for %s", i.ModID)
 }
 
 func (i *Info) Backup() error {
