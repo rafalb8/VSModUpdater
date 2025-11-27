@@ -25,6 +25,8 @@ Simply download the zip file, extract the contents, and run the appropriate exec
   * If this flag is set, the program will move old mods to the backup directory instead of deleting them.
 * `-interactive`
   * Starts the program in an interactive mode, allowing you to select which mods to update. This is the default behavior on Windows.
+* `-pre-release`
+  * Allows updating to pre-release mod versions (e.g., alpha, beta). This functionality is also enabled automatically if a mod is already a pre-release version.
 * `-ignore <modID1,modID2,...>`
   * Provides a comma-separated list of mod IDs to skip during updates.
 
