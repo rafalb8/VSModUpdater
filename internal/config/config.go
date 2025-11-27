@@ -17,6 +17,7 @@ var (
 	DryRun      bool
 	Backup      bool
 	Interactive bool
+	PreRelease  bool
 	Ignored     map[string]struct{}
 )
 
@@ -40,6 +41,7 @@ func init() {
 	flag.BoolVar(&DryRun, "dry-run", false, "run the updater without actually doing anything")
 	flag.BoolVar(&Backup, "backup", false, "backup mods instead of removing them")
 	flag.BoolVar(&Interactive, "interactive", runtime.GOOS != "linux", "interactive update mode")
+	flag.BoolVar(&PreRelease, "pre-release", false, "allow updating to pre-release mod versions (enabled if mod is already pre-release)")
 	flag.Func("ignore", "disable updates: modID1,modID2,...", func(s string) error {
 		mods := strings.Split(s, ",")
 		Ignored = make(map[string]struct{}, len(mods))

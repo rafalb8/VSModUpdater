@@ -3,6 +3,7 @@ package mod
 import (
 	"archive/zip"
 	"bytes"
+	"cmp"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -150,6 +151,9 @@ func (i *Info) CheckUpdates() (Update, error) {
 		return Update{}, ErrNoModID
 	}
 
+	// true if the current version is a prerelease OR if the flag pre-release is set.
+	allowDev := cmp.Or(i.Version.PreRelease(), config.PreRelease)
+
 	uri, err := url.JoinPath("https://mods.vintagestory.at/api/mod/", i.ModID)
 	if err != nil {
 		return Update{}, fmt.Errorf("Info.CheckUpdates: %w", err)
@@ -168,6 +172,11 @@ func (i *Info) CheckUpdates() (Update, error) {
 	}
 
 	for _, release := range r.Mod.Releases {
+		if !allowDev && release.ModVersion.PreRelease() {
+			// skip pre-release version
+			continue
+		}
+
 		if release.ModVersion.Compare(i.Version) > 0 {
 			return Update{
 				URL:      release.Mainfile,

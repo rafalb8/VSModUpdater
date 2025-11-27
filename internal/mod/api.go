@@ -81,3 +81,7 @@ func (v *SemVer) UnmarshalJSON(data []byte) error {
 func (v SemVer) Compare(x SemVer) int {
 	return semver.Compare(string(v), string(x))
 }
+
+func (v SemVer) PreRelease() bool {
+	return semver.Prerelease(string(v)) != ""
+}
