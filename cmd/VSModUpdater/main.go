@@ -21,6 +21,9 @@ func main() {
 	case config.List:
 		modes.List()
 
+	case config.Webpage:
+		modes.Webpage()
+
 	default:
 		modes.Update()
 	}

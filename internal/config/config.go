@@ -26,6 +26,14 @@ var (
 	Version bool
 	Self    bool
 	List    bool
+	Webpage bool
+)
+
+// Webpage options
+var (
+	WebpageOutput string
+	WebpageTitle  string
+	WebpageDeploy string
 )
 
 func init() {
@@ -55,4 +63,10 @@ func init() {
 	flag.BoolVar(&Self, "self", false, "update VSModUpdater")
 	flag.BoolVar(&Version, "version", false, "print version")
 	flag.BoolVar(&List, "list", false, "list mods")
+	flag.BoolVar(&Webpage, "webpage", false, "generate static HTML modlist webpage")
+	
+	// Webpage options
+	flag.StringVar(&WebpageOutput, "output", "modlist.html", "output filename for webpage")
+	flag.StringVar(&WebpageTitle, "title", "Server Modlist", "title for the webpage")
+	flag.StringVar(&WebpageDeploy, "deploy", "", "deploy to Cloudflare Pages project (specify project name)")
 }

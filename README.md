@@ -39,6 +39,8 @@ The program can run in several modes. You should only use one mode at a time.
   * Updates the Vintage Story Mod Updater program itself.
 * `-list`
   * Lists all installed mods and their versions.
+* `-webpage`
+  * Generates a static HTML modlist webpage.
 
 
 ### Examples
@@ -62,3 +64,44 @@ The program can run in several modes. You should only use one mode at a time.
 ```sh
 ./VSModUpdater -version
 ```
+
+## Webpage Generation
+
+The `-webpage` mode generates a static HTML file that can be hosted to share your server's modlist. The generated page includes live search, sortable columns, and automatic dark/light theme detection.
+
+**Additional flags:**
+* `-output <filename>` - Output filename (default: `modlist.html`)
+* `-title <title>` - Page title (default: `"Server Modlist"`)
+* `-deploy <project>` - Deploy to Cloudflare Pages project
+
+**Examples:**
+
+**Generate a basic modlist:**
+```sh
+./VSModUpdater -webpage
+```
+**Generate with custom title and filename:**
+```sh
+./VSModUpdater -webpage -title "Super Awesome Server Mods" -output public/mods.html
+```
+**Generate and deploy to Cloudflare Pages:**
+```sh
+./VSModUpdater -webpage -deploy my-server-mods
+```
+
+**Deploying to Cloudflare Pages:**
+
+First-time setup:
+```sh
+npm install -g wrangler
+wrangler login
+```
+
+Then generate and deploy:
+```sh
+./VSModUpdater -webpage -deploy your-project-name
+```
+
+The modlist will be available at `https://your-project-name.pages.dev`
+
+The generated HTML file can also be uploaded to any web host.
