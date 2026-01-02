@@ -16,28 +16,37 @@
 
         <div class="controls">
             <input type="text" id="search" placeholder="Search mods..." onkeyup="filterTable()">
-            <div class="category-filters" id="categoryFilters"></div>
+            <div class="column-toggles">
+                <span class="toggle-label">Show columns:</span>
+                <label><input type="checkbox" id="toggle-version" onchange="toggleColumn(1)"> Version</label>
+                <label><input type="checkbox" id="toggle-author" onchange="toggleColumn(2)"> Author</label>
+                <label><input type="checkbox" id="toggle-description" onchange="toggleColumn(3)" checked> Description</label>
+                <label><input type="checkbox" id="toggle-category" onchange="toggleColumn(4)" checked> Category</label>
+                <label><input type="checkbox" id="toggle-gameversion" onchange="toggleColumn(5)"> Game Version</label>
+            </div>
         </div>
 
         <div class="table-container">
             <table id="modTable">
                 <thead>
                     <tr>
-                        <th onclick="sortTable(0)">Name <span class="sort-indicator">↕</span></th>
-                        <th onclick="sortTable(1)">Version <span class="sort-indicator">↕</span></th>
-                        <th onclick="sortTable(2)">Author <span class="sort-indicator">↕</span></th>
-                        <th onclick="sortTable(3)">Description <span class="sort-indicator">↕</span></th>
-                        <th onclick="sortTable(4)">Game Version <span class="sort-indicator">↕</span></th>
+                        <th onclick="sortTable(0)">Name/Link <span class="sort-indicator">↕</span></th>
+                        <th class="col-1 hidden" onclick="sortTable(1)">Version <span class="sort-indicator">↕</span></th>
+                        <th class="col-2 hidden" onclick="sortTable(2)">Author <span class="sort-indicator">↕</span></th>
+                        <th class="col-3" onclick="sortTable(3)">Description <span class="sort-indicator">↕</span></th>
+                        <th class="col-4" onclick="sortTable(4)">Category <span class="sort-indicator">↕</span></th>
+                        <th class="col-5 hidden" onclick="sortTable(5)">Game Version <span class="sort-indicator">↕</span></th>
                     </tr>
                 </thead>
                 <tbody>
                 {{range .Mods}}
                     <tr>
                         <td>{{if .URL}}<a href="{{.URL}}" target="_blank" rel="noopener">{{.Name}}</a>{{else}}{{.Name}}{{end}}</td>
-                        <td>{{.Version}}</td>
-                        <td>{{.Authors}}</td>
-                        <td>{{.Description}}</td>
-                        <td>{{.GameVersion}}</td>
+                        <td class="col-1 hidden">{{.Version}}</td>
+                        <td class="col-2 hidden">{{.Authors}}</td>
+                        <td class="col-3">{{.Description}}</td>
+                        <td class="col-4">{{if .Category}}<span class="category-badge" style="background-color: {{.CategoryColor}};">{{.Category}}</span>{{end}}</td>
+                        <td class="col-5 hidden">{{.GameVersion}}</td>
                     </tr>
                 {{end}}
                 </tbody>

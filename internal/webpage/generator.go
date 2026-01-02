@@ -28,12 +28,14 @@ type Options struct {
 
 // ModData represents a mod for template rendering
 type ModData struct {
-	Name        string
-	Version     string
-	Authors     string
-	Description string
-	GameVersion string
-	URL         string
+	Name          string
+	Version       string
+	Authors       string
+	Description   string
+	GameVersion   string
+	URL           string
+	Category      string
+	CategoryColor string
 }
 
 // PageData represents the full page data for template rendering
@@ -48,14 +50,17 @@ type PageData struct {
 
 // Generate creates a self-contained HTML page with mod information
 func Generate(mods []*mod.Info, opts Options) string {
-	// Sort mods by name
-	sort.Slice(mods, func(i, j int) bool {
-		return strings.ToLower(mods[i].Name) < strings.ToLower(mods[j].Name)
-	})
+	return GenerateWithConfig(mods, opts, nil)
+}
 
-	// Filter out mods with errors and convert to ModData
+// GenerateWithConfig creates a self-contained HTML page with mod information using a config file
+func GenerateWithConfig(mods []*mod.Info, opts Options, cfg *Config) string {
+	// First pass: collect mod data with categories
 	modDataList := make([]ModData, 0, len(mods))
 	for _, m := range mods {
+		if m.Error != nil {
+			continue
+		}
 		if m.Error != nil {
 			continue
 		}
@@ -65,7 +70,11 @@ func Generate(mods []*mod.Info, opts Options) string {
 			authors = "Unknown"
 		}
 
+		// Use custom description if available
 		desc := m.Description
+		if cfg != nil {
+			desc = cfg.GetDescription(m)
+		}
 		if len(desc) > 200 {
 			desc = desc[:197] + "..."
 		}
@@ -78,15 +87,45 @@ func Generate(mods []*mod.Info, opts Options) string {
 			gameVer = gv
 		}
 
+		// Get category info
+		category := ""
+		categoryColor := ""
+		if cfg != nil {
+			categoryKey := cfg.GetCategory(m.ModID)
+			if categoryKey != "" {
+				category = cfg.GetCategoryName(categoryKey)
+				categoryColor = cfg.GetCategoryColor(categoryKey)
+			}
+		}
+
 		modDataList = append(modDataList, ModData{
-			Name:        m.Name,
-			Version:     string(m.Version),
-			Authors:     authors,
-			Description: desc,
-			GameVersion: gameVer,
-			URL:         getModURL(m.ModID),
+			Name:          m.Name,
+			Version:       string(m.Version),
+			Authors:       authors,
+			Description:   desc,
+			GameVersion:   gameVer,
+			URL:           getModURL(m.ModID),
+			Category:      category,
+			CategoryColor: categoryColor,
 		})
 	}
+
+	// Sort by category first, then by name
+	sort.Slice(modDataList, func(i, j int) bool {
+		// If categories are different, sort by category
+		if modDataList[i].Category != modDataList[j].Category {
+			// Empty categories go to the end
+			if modDataList[i].Category == "" {
+				return false
+			}
+			if modDataList[j].Category == "" {
+				return true
+			}
+			return strings.ToLower(modDataList[i].Category) < strings.ToLower(modDataList[j].Category)
+		}
+		// If categories are the same, sort by name
+		return strings.ToLower(modDataList[i].Name) < strings.ToLower(modDataList[j].Name)
+	})
 
 	// Prepare page data
 	pageData := PageData{

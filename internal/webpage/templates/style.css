@@ -105,6 +105,44 @@ h1 {
     border-color: var(--accent-color);
 }
 
+.column-toggles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.toggle-label {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-right: 0.5rem;
+}
+
+.column-toggles label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: color 0.2s;
+}
+
+.column-toggles label:hover {
+    color: var(--text-primary);
+}
+
+.column-toggles input[type="checkbox"] {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+}
+
+.hidden {
+    display: none !important;
+}
+
 .table-container {
     background: var(--bg-primary);
     border-radius: 8px;
@@ -172,6 +210,16 @@ a {
 a:hover {
     color: var(--accent-hover);
     text-decoration: underline;
+}
+
+.category-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: white;
+    white-space: nowrap;
 }
 
 footer {

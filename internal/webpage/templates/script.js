@@ -104,3 +104,21 @@ function sortTable(columnIndex) {
         }
     }
 }
+
+// Column toggle
+function toggleColumn(columnIndex) {
+    const table = document.getElementById('modTable');
+    const headers = table.getElementsByTagName('th');
+    const rows = table.getElementsByTagName('tr');
+    
+    // Toggle header
+    headers[columnIndex].classList.toggle('hidden');
+    
+    // Toggle cells in all rows
+    for (let i = 1; i < rows.length; i++) {
+        const cells = rows[i].getElementsByTagName('td');
+        if (cells[columnIndex]) {
+            cells[columnIndex].classList.toggle('hidden');
+        }
+    }
+}

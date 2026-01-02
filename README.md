@@ -105,3 +105,88 @@ Then generate and deploy:
 The modlist will be available at `https://your-project-name.pages.dev`
 
 The generated HTML file can also be uploaded to any web host.
+
+### Custom Descriptions and Categories
+
+You can customize mod descriptions and organize mods into categories using a configuration file (`webpage_config.json` by default).
+
+#### Interactive Configuration Mode
+
+Configure all mods interactively:
+```sh
+./VSModUpdater -config
+```
+
+This will walk you through each installed mod, allowing you to set custom descriptions and categories.
+
+#### Edit a Specific Mod
+
+Edit configuration for a single mod:
+```sh
+./VSModUpdater -edit-mod=modid
+```
+
+Example:
+```sh
+./VSModUpdater -edit-mod=alchemy
+```
+
+#### Category Management
+
+Add a new category:
+```sh
+./VSModUpdater -add-category="Category Name:#color"
+```
+
+Example:
+```sh
+./VSModUpdater -add-category="Quality of Life:#4285f4"
+```
+
+Edit an existing category (rename and/or change color):
+```sh
+./VSModUpdater -edit-category="OldName:NewName:#newcolor"
+```
+
+Example:
+```sh
+# Just rename:
+./VSModUpdater -edit-category="QoL:Quality of Life"
+
+# Rename and change color:
+./VSModUpdater -edit-category="QoL:Quality of Life:#4285f4"
+```
+
+Delete a category (only if no mods use it):
+```sh
+./VSModUpdater -delete-category="Category Name"
+```
+
+#### Configuration File Format
+
+The configuration file is JSON format:
+```json
+{
+  "categories": {
+    "Content": {
+      "name": "Content",
+      "color": "#ea4335"
+    },
+    "Quality of Life": {
+      "name": "Quality of Life",
+      "color": "#4285f4"
+    }
+  },
+  "mods": {
+    "modid": {
+      "description": "Custom description for this mod",
+      "category": "Content"
+    }
+  }
+}
+```
+
+The configuration is automatically loaded when generating the webpage. You can specify a different config file path:
+```sh
+./VSModUpdater -webpage -webpage-config=path/to/config.json
+```
