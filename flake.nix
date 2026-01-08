@@ -7,7 +7,7 @@
 
   outputs = { self, nixpkgs }:
     let
-      version = "v1.2.0";
+      version = "v1.2.1";
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
     in
@@ -41,6 +41,7 @@
 
       devShells.${system}.default = pkgs.mkShell {
         env.CGO_ENABLED = "0";
+        env.TAG = version;
         packages = with pkgs; [ go zip ];
       };
     };
