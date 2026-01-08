@@ -46,10 +46,11 @@ func Update() {
 		switch err {
 		case nil:
 		case mod.ErrNoUpdate:
-			fmt.Println(m, "- Skip")
+			fmt.Println(m, "- No updates")
 			continue
 		case mod.ErrPreReleaseSkip:
 			fmt.Println(m, "- Pre-release version available")
+			continue
 		default:
 			fmt.Println(m, "-", err)
 			continue
