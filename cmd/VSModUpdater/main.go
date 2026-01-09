@@ -21,6 +21,14 @@ func main() {
 	case config.List:
 		modes.List()
 
+	case config.Webpage:
+		modes.Webpage()
+
+	case config.WebConfigMode || config.ConfigModID != "" || config.ConfigAddCat != "" || config.ConfigEditCat != "" || config.ConfigDelCat != "":
+		if err := modes.ConfigManagement(); err != nil {
+			fmt.Printf("Error: %v\n", err)
+		}
+
 	default:
 		modes.Update()
 	}
