@@ -1,7 +1,7 @@
 # Maintainer: Rafal Babinski <rafalb8@hotmail.com>
 
 pkgname=VSModUpdater
-pkgver=v1.2.1
+pkgver=v1.2.2
 pkgrel=1
 pkgdesc='Vintage Story Mod Updater'
 arch=('x86_64')

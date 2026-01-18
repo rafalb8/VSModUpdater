@@ -75,6 +75,13 @@ func Update() {
 			}
 		}
 
+		// Backup before download. New file might have the same filename
+		err = m.Backup()
+		if err != nil {
+			fmt.Println(m, "-", err)
+			continue
+		}
+
 		fmt.Printf("Downloading %s: %s => %s - ", m.Name, m.Version, update.Version)
 		err = update.Download()
 		if err != nil {
@@ -85,13 +92,12 @@ func Update() {
 		fmt.Println("SUCCESS")
 
 		if config.Backup {
-			fmt.Printf("Backing up %s - ", m)
-			err = m.Backup()
-		} else {
-			fmt.Printf("Removing %s - ", m)
-			err = os.Remove(m.Path)
+			continue
 		}
 
+		// Remove the backup
+		fmt.Printf("Removing %s - ", m)
+		err = os.Remove(m.Path)
 		if err != nil {
 			fmt.Println("FAIL")
 			fmt.Println(err)

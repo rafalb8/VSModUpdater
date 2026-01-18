@@ -196,5 +196,7 @@ func (i *Info) Backup() error {
 		return err
 	}
 
-	return os.Rename(i.Path, filepath.Join(config.BackupPath, filepath.Base(i.Path)))
+	oldPath := i.Path
+	i.Path = filepath.Join(config.BackupPath, filepath.Base(i.Path))
+	return os.Rename(oldPath, i.Path)
 }
