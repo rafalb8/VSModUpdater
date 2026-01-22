@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 
 	"github.com/rafalb8/VSModUpdater/internal/config"
@@ -9,8 +8,6 @@ import (
 )
 
 func main() {
-	flag.Parse()
-
 	switch {
 	case config.Version:
 		fmt.Println(config.VersionNum)

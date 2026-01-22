@@ -1,5 +1,6 @@
 /result
-/mods
+/Mods
+/ModBackups
 
 /*.pkg*
 /VSModUpdater

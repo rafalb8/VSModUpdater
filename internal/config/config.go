@@ -37,7 +37,7 @@ func init() {
 
 	// Flags
 	flag.StringVar(&ModPath, "mod-path", filepath.Join(cfgPath, "Mods"), "path to VS mod directory")
-	flag.StringVar(&BackupPath, "backup-path", filepath.Join(cfgPath, "ModBackups"), "path to VS mod backup directory")
+	flag.StringVar(&BackupPath, "backup-path", "", "path to VS mod backup directory")
 	flag.BoolVar(&DryRun, "dry-run", false, "run the updater without actually doing anything")
 	flag.BoolVar(&Backup, "backup", false, "backup mods instead of removing them")
 	flag.BoolVar(&Interactive, "interactive", runtime.GOOS != "linux", "interactive update mode")
@@ -55,4 +55,17 @@ func init() {
 	flag.BoolVar(&Self, "self", false, "update VSModUpdater")
 	flag.BoolVar(&Version, "version", false, "print version")
 	flag.BoolVar(&List, "list", false, "list mods")
+
+	flag.Parse()
+
+	// Make sure modpath is absolute path
+	ModPath, err = filepath.Abs(ModPath)
+	if err != nil {
+		panic(err)
+	}
+
+	if BackupPath == "" {
+		// Set backup path as a sibling of mod path
+		BackupPath = filepath.Join(filepath.Dir(ModPath), "ModBackups")
+	}
 }

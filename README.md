@@ -17,7 +17,7 @@ Simply download the zip file, extract the contents, and run the appropriate exec
   * Specifies the path to your Vintage Story mods directory.
   * **Default:** `~/.config/VintagestoryData/Mods` (on Linux) or `%APPDATA%/VintagestoryData/Mods` (on Windows).
 * `-backup-path <path>`
-  * Specifies where to store mod backups.
+  * Specifies where to store mod backups. If not set, uses `mod-path` to determine a sibling directory named `ModBackups`.
   * **Default:** `~/.config/VintagestoryData/ModBackups` (on Linux) or `%APPDATA%/VintagestoryData/ModBackups` (on Windows).
 * `-dry-run`
   * If this flag is set, the program will just print the updates.
