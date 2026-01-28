@@ -26,6 +26,8 @@ var (
 	Version bool
 	Self    bool
 	List    bool
+	Import  string
+	Export  string
 )
 
 func init() {
@@ -55,6 +57,8 @@ func init() {
 	flag.BoolVar(&Self, "self", false, "update VSModUpdater")
 	flag.BoolVar(&Version, "version", false, "print version")
 	flag.BoolVar(&List, "list", false, "list mods")
+	flag.StringVar(&Import, "import", "", "import mod list")
+	flag.StringVar(&Export, "export", "", "export mod list")
 
 	flag.Parse()
 

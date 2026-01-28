@@ -16,7 +16,7 @@ var (
 )
 
 type Response struct {
-	Mod        Mod    `json:"mod,omitempty"`
+	Mod        Mod    `json:"mod"`
 	StatusCode string `json:"statuscode,omitempty"`
 }
 
@@ -64,6 +64,18 @@ type Mod struct {
 
 type SemVer string
 
+func SemVerFromString(x string) (SemVer, error) {
+	if x != "" && x[0] != 'v' {
+		x = "v" + x
+	}
+	
+	if !semver.IsValid(x) {
+		return "", fmt.Errorf("SemVer: '%s' %w", x, ErrInvalidSemVer)
+	}
+	
+	return SemVer(x), nil
+}
+
 func (v *SemVer) UnmarshalJSON(data []byte) error {
 	x := string(data)
 	x = strings.Trim(x, `"`)
@@ -86,4 +98,11 @@ func (v SemVer) Compare(x SemVer) int {
 
 func (v SemVer) PreRelease() bool {
 	return semver.Prerelease(string(v)) != ""
+}
+
+func (v SemVer) String() string {
+	if v != "" && v[0] != 'v' {
+		return "v" + string(v)
+	}
+	return string(v)
 }

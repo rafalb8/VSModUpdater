@@ -17,6 +17,12 @@ func main() {
 
 	case config.List:
 		modes.List()
+		
+	case config.Import != "":
+		modes.Import(config.Import)
+		
+	case config.Export != "":
+		modes.Export(config.Export)
 
 	default:
 		modes.Update()

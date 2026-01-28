@@ -171,7 +171,8 @@ func (i *Info) CheckUpdates() (upd Update, err error) {
 	if err != nil {
 		return upd, fmt.Errorf("Info.CheckUpdates: %w", err)
 	}
-
+	
+	upd.Name = r.Mod.Name
 	for _, release := range r.Mod.Releases {
 		if !allowDev && release.ModVersion.PreRelease() {
 			// skip pre-release version
