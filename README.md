@@ -39,6 +39,10 @@ The program can run in several modes. You should only use one mode at a time.
   * Updates the Vintage Story Mod Updater program itself.
 * `-list`
   * Lists all installed mods and their versions.
+* `-import <modlist.txt>`
+  * Download modlist to `-mod-path`
+* `-export <modlist.txt>`
+  * Save modlist from `-mod-path` to `<modlist.txt>`
 
 
 ### Examples
