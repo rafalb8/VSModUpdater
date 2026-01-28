@@ -15,10 +15,10 @@ Simply download the zip file, extract the contents, and run the appropriate exec
 ### Flag Reference
 * `-mod-path <path>`
   * Specifies the path to your Vintage Story mods directory.
-  * **Default:** `~/.config/VintagestoryData/Mods` (on Linux) or `%APPDATA%/VintagestoryData/Mods` (on Windows).
+  * **Default:** `~/.config/VintagestoryData/Mods` (on Linux) or `%APPDATA%\VintagestoryData\Mods` (on Windows).
 * `-backup-path <path>`
   * Specifies where to store mod backups. If not set, uses `mod-path` to determine a sibling directory named `ModBackups`.
-  * **Default:** `~/.config/VintagestoryData/ModBackups` (on Linux) or `%APPDATA%/VintagestoryData/ModBackups` (on Windows).
+  * **Default:** `~/.config/VintagestoryData/ModBackups` (on Linux) or `%APPDATA%\VintagestoryData\ModBackups` (on Windows).
 * `-dry-run`
   * If this flag is set, the program will just print the updates.
 * `-backup`
@@ -39,10 +39,10 @@ The program can run in several modes. You should only use one mode at a time.
   * Updates the Vintage Story Mod Updater program itself.
 * `-list`
   * Lists all installed mods and their versions.
-* `-import <modlist.txt>`
+* `-import <file>`
   * Download modlist to `-mod-path`
-* `-export <modlist.txt>`
-  * Save modlist from `-mod-path` to `<modlist.txt>`
+* `-export <file>`
+  * Save modlist from `-mod-path` to `<file>`
 
 
 ### Examples
