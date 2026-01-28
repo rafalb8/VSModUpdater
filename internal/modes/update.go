@@ -106,5 +106,5 @@ func Update() {
 		fmt.Println("SUCCESS")
 	}
 
-	fmt.Println("Finished Updating.")
+	fmt.Println("Finished update")
 }

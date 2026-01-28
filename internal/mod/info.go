@@ -42,8 +42,8 @@ type Info struct {
 	Dependencies     map[string]string `json:"dependencies,omitempty"`
 }
 
-func InfoFromZip(path string) (*Info, error) {
-	r, err := zip.OpenReader(path)
+func InfoFromZip(filepath string) (*Info, error) {
+	r, err := zip.OpenReader(filepath)
 	if err != nil {
 		return nil, err
 	}
@@ -77,12 +77,13 @@ func InfoFromZip(path string) (*Info, error) {
 			return nil, err
 		}
 
-		info := &Info{Path: path}
+		info := &Info{Path: filepath}
 		return info, json.Unmarshal(data, info)
 	}
-	return nil, fmt.Errorf("mod.InfoFromZip: no files found in %s", path)
+	return nil, fmt.Errorf("mod.InfoFromZip: no files found in %s", filepath)
 }
 
+// Returns Info slice from zip files
 func InfoFromPath(path string) ([]*Info, error) {
 	mods := []*Info{}
 	err := filepath.WalkDir(config.ModPath, func(path string, d fs.DirEntry, err error) error {
