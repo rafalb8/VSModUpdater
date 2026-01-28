@@ -66,3 +66,7 @@ The program can run in several modes. You should only use one mode at a time.
 ```sh
 ./VSModUpdater -version
 ```
+**Export modlist to a file:**
+```sh
+./VSModUpdater -export modlist.txt
+```
