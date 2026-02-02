@@ -78,7 +78,7 @@ func Update() {
 		// Backup before download. New file might have the same filename
 		err = m.Backup()
 		if err != nil {
-			fmt.Println(m, "-", err)
+			fmt.Println(m, "- Backup failed:", err)
 			continue
 		}
 
@@ -87,6 +87,14 @@ func Update() {
 		if err != nil {
 			fmt.Println("FAIL")
 			fmt.Println(err)
+
+			// Try to restore the backup
+			err = m.Restore()
+			if err != nil {
+				fmt.Println(m, "- Restore failed:", err)
+				continue
+			}
+
 			continue
 		}
 		fmt.Println("SUCCESS")

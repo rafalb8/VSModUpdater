@@ -202,3 +202,14 @@ func (i *Info) Backup() error {
 	i.Path = filepath.Join(config.BackupPath, filepath.Base(i.Path))
 	return os.Rename(oldPath, i.Path)
 }
+
+func (i *Info) Restore() error {
+	err := os.MkdirAll(config.ModPath, 0o755)
+	if err != nil {
+		return err
+	}
+
+	oldPath := i.Path
+	i.Path = filepath.Join(config.ModPath, filepath.Base(i.Path))
+	return os.Rename(oldPath, i.Path)
+}
