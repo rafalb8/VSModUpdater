@@ -3,16 +3,18 @@ package mod
 import (
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 
 	"golang.org/x/mod/semver"
 )
 
 var (
-	ErrNoUpdate      = errors.New("no update")
-	ErrNoModID       = errors.New("no modid")
-	ErrInvalidSemVer = errors.New("is not a valid Semantic Version")
+	ErrNoUpdate       = errors.New("no update")
+	ErrNoModID        = errors.New("no modid")
+	ErrInvalidSemVer  = errors.New("is not a valid Semantic Version")
 	ErrPreReleaseSkip = errors.New("skipped pre-release version")
+	ErrUnstableSkip   = errors.New("skipped pre-release game version")
 )
 
 type Response struct {
@@ -26,9 +28,9 @@ type Releases struct {
 	Filename   string   `json:"filename,omitempty"`
 	FileID     int      `json:"fileid,omitempty"`
 	Downloads  int      `json:"downloads,omitempty"`
-	Tags       []string `json:"tags,omitempty"`
+	Tags       []SemVer `json:"tags,omitempty"` // Supported game versions list
 	ModIDStr   string   `json:"modidstr,omitempty"`
-	ModVersion SemVer   `json:"modversion,omitempty"`
+	ModVersion SemVer   `json:"modversion"`
 	Created    string   `json:"created,omitempty"`
 	Changelog  string   `json:"changelog,omitempty"`
 }
@@ -62,47 +64,72 @@ type Mod struct {
 	Screenshots     []any      `json:"screenshots,omitempty"`
 }
 
-type SemVer string
+type SemVer struct {
+	string
+}
 
-func SemVerFromString(x string) (SemVer, error) {
-	if x != "" && x[0] != 'v' {
-		x = "v" + x
+func NewSemVer(x string) (SemVer, error) {
+	v := SemVer{x}
+	v.Sanitize()
+
+	if !v.IsValid() {
+		return SemVer{}, fmt.Errorf("SemVer: '%s' %w", x, ErrInvalidSemVer)
 	}
-	
-	if !semver.IsValid(x) {
-		return "", fmt.Errorf("SemVer: '%s' %w", x, ErrInvalidSemVer)
-	}
-	
-	return SemVer(x), nil
+	return v, nil
 }
 
 func (v *SemVer) UnmarshalJSON(data []byte) error {
-	x := string(data)
-	x = strings.Trim(x, `"`)
+	v.string = string(data)
+	v.string = strings.Trim(v.string, `"`)
 
-	if x != "" && x[0] != 'v' {
-		x = "v" + x
+	v.Sanitize()
+
+	if !v.IsValid() {
+		return fmt.Errorf("SemVer: '%s' %w", v.string, ErrInvalidSemVer)
 	}
-
-	if !semver.IsValid(x) {
-		return fmt.Errorf("SemVer: '%s' %w", x, ErrInvalidSemVer)
-	}
-
-	*v = SemVer(x)
 	return nil
 }
 
+func (v *SemVer) Sanitize() {
+	if v != nil && v.string != "" && v.string[0] != 'v' {
+		v.string = "v" + v.string
+	}
+}
+
+func (v SemVer) IsValid() bool {
+	return semver.IsValid(v.string)
+}
+
 func (v SemVer) Compare(x SemVer) int {
-	return semver.Compare(string(v), string(x))
+	return semver.Compare(v.string, x.string)
 }
 
 func (v SemVer) PreRelease() bool {
-	return semver.Prerelease(string(v)) != ""
+	return semver.Prerelease(v.string) != ""
 }
 
 func (v SemVer) String() string {
-	if v != "" && v[0] != 'v' {
-		return "v" + string(v)
+	v.Sanitize()
+	return v.string
+}
+
+func GetLatestVersion(versions []SemVer) SemVer {
+	if len(versions) == 0 {
+		return SemVer{}
 	}
-	return string(v)
+
+	return slices.MaxFunc(versions, func(a, b SemVer) int { return a.Compare(b) })
+}
+
+func IsAllPreRelease(versions []SemVer) bool {
+	if len(versions) == 0 {
+		return false
+	}
+
+	for _, v := range versions {
+		if !v.PreRelease() {
+			return false
+		}
+	}
+	return true
 }

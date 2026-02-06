@@ -51,6 +51,9 @@ func Update() {
 		case mod.ErrPreReleaseSkip:
 			fmt.Println(m, "- Pre-release version available")
 			continue
+		case mod.ErrUnstableSkip:
+			fmt.Println(m, "- Pre-release game version support available")
+			continue
 		default:
 			fmt.Println(m, "-", err)
 			continue

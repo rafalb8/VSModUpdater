@@ -21,9 +21,14 @@ func Self() {
 		return
 	}
 
+	version, err := mod.NewSemVer(config.VersionNum)
+	if err != nil {
+		version, _ = mod.NewSemVer("v0.0.0")
+	}
+
 	m := mod.Info{
 		ModID:   "5060",
-		Version: mod.SemVer(config.VersionNum),
+		Version: version,
 	}
 
 	fmt.Print("Checking for update - ")

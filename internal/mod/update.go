@@ -26,7 +26,7 @@ func UpdateFromString(line string) (upd Update, err error) {
 		return upd, fmt.Errorf("failed to parse info")
 	}
 
-	semver, err := SemVerFromString(version)
+	semver, err := NewSemVer(version)
 	if err != nil {
 		return upd, err
 	}

@@ -119,7 +119,7 @@ func (i *Info) String() string {
 		name := filepath.Base(i.Path)
 		return name[:len(name)-len(filepath.Ext(name))]
 	}
-	return i.Name + "@" + string(i.Version)
+	return i.Name + "@" + i.Version.String()
 }
 
 // Details returns detailed mod info string
@@ -133,7 +133,7 @@ func (i *Info) Details() string {
 
 	sb.WriteString("Name:\t\t" + i.Name + "\n")
 	sb.WriteString("ModID:\t\t" + i.ModID + "\n")
-	sb.WriteString("Version:\t" + string(i.Version) + "\n")
+	sb.WriteString("Version:\t" + i.Version.String() + "\n")
 	gameVer, ok := i.Dependencies["game"]
 	if ok {
 		if gameVer == "*" || gameVer == "" {
@@ -171,12 +171,23 @@ func (i *Info) CheckUpdates() (upd Update, err error) {
 	if err != nil {
 		return upd, fmt.Errorf("Info.CheckUpdates: %w", err)
 	}
-	
+
 	upd.Name = r.Mod.Name
 	for _, release := range r.Mod.Releases {
 		if !allowDev && release.ModVersion.PreRelease() {
-			// skip pre-release version
+			// Skip pre-release version
 			err = ErrPreReleaseSkip
+			continue
+		}
+
+		if release.ModVersion.Compare(i.Version) <= 0 {
+			return upd, cmp.Or(err, ErrNoUpdate)
+		}
+
+		// Check if game version is stable
+		if !allowDev && IsAllPreRelease(release.Tags) {
+			// Skip pre-release game version
+			err = ErrUnstableSkip
 			continue
 		}
 
@@ -186,8 +197,6 @@ func (i *Info) CheckUpdates() (upd Update, err error) {
 			upd.Filename = release.Filename
 			return
 		}
-
-		return upd, cmp.Or(err, ErrNoUpdate)
 	}
 	return upd, fmt.Errorf("Info.CheckUpdates: no release found for %s", i.ModID)
 }
