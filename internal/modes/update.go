@@ -67,7 +67,7 @@ func Update() {
 		if config.Interactive {
 			shouldUpdate := ""
 			fmt.Printf("Update %s: %s => %s? [Y/n/a] ", m.Name, m.Version, update.Version)
-			fmt.Scanf("%s", &shouldUpdate)
+			fmt.Scanln(&shouldUpdate)
 			if len(shouldUpdate) > 0 {
 				switch shouldUpdate[0] | ' ' {
 				case 'n':
