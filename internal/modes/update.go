@@ -60,7 +60,7 @@ func Update() {
 		}
 
 		if config.DryRun {
-			fmt.Printf("%s - Update v%s found!\n", m, update.Version)
+			fmt.Printf("%s - Update %s found!\n", m, update.Version)
 			continue
 		}
 
