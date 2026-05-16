@@ -25,13 +25,13 @@ linux:
 	CGO_ENABLED=0 \
 	GOARCH=amd64 \
 	GOOS=linux \
-	go build -ldflags=$(LDFLAGS) -o result/linux/VSModUpdater ./cmd/VSModUpdater
+	go build -trimpath -ldflags=$(LDFLAGS) -o result/linux/VSModUpdater .
 
 windows:
 	CGO_ENABLED=0 \
 	GOARCH=amd64 \
 	GOOS=windows \
-	go build -ldflags=$(LDFLAGS) -o result/windows/VSModUpdater.exe ./cmd/VSModUpdater
+	go build -trimpath -ldflags=$(LDFLAGS) -o result/windows/VSModUpdater.exe .
 
 darwin: darwin-amd64 darwin-arm64
 	cd result/darwin && go tool lipo -output VSModUpdater_macOS -create VSModUpdater_amd64 VSModUpdater_arm64
@@ -40,13 +40,13 @@ darwin-amd64:
 	CGO_ENABLED=0 \
 	GOARCH=amd64 \
 	GOOS=darwin \
-	go build -ldflags=$(LDFLAGS) -o result/darwin/VSModUpdater_amd64 ./cmd/VSModUpdater
+	go build -trimpath -ldflags=$(LDFLAGS) -o result/darwin/VSModUpdater_amd64 .
 
 darwin-arm64:
 	CGO_ENABLED=0 \
 	GOARCH=arm64 \
 	GOOS=darwin \
-	go build -ldflags=$(LDFLAGS) -o result/darwin/VSModUpdater_arm64 ./cmd/VSModUpdater
+	go build -trimpath -ldflags=$(LDFLAGS) -o result/darwin/VSModUpdater_arm64 .
 
 clean:
 	rm -rf result/*

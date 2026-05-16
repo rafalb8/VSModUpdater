@@ -10,6 +10,11 @@ The program is distributed as a [zip file](https://github.com/rafalb8/VSModUpdat
 
 Simply download the zip file, extract the contents, and run the appropriate executable for your operating system.
 
+If you have `go` installed, you can install it using:
+```sh
+go install -trimpath github.com/rafalb8/VSModUpdater@latest
+```
+
 ## Usage
 
 ### Flag Reference
