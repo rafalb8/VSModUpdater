@@ -6,8 +6,8 @@ tool github.com/konoui/lipo
 
 require (
 	github.com/spf13/pflag v1.0.10
-	github.com/tailscale/hujson v0.0.0-20250605163823-992244df8c5a
-	golang.org/x/mod v0.30.0
+	github.com/tailscale/hujson v0.0.0-20260302212456-ecc657c15afd
+	golang.org/x/mod v0.36.0
 )
 
 require (
