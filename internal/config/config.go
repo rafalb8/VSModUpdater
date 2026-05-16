@@ -4,12 +4,11 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"runtime/debug"
 	"strings"
 
 	"github.com/spf13/pflag"
 )
-
-var VersionNum string = "v0.0.0"
 
 // Flags
 var (
@@ -75,4 +74,14 @@ func init() {
 		// Set backup path as a sibling of mod path
 		BackupPath = filepath.Join(filepath.Dir(ModPath), "ModBackups")
 	}
+}
+
+var version = "v0.0.0"
+
+func BuildVersion() string {
+	info, ok := debug.ReadBuildInfo()
+	if ok && info.Main.Version != "" && info.Main.Version != "(devel)" {
+		return info.Main.Version
+	}
+	return version
 }

@@ -1,7 +1,7 @@
 # Maintainer: Rafal Babinski <rafalb8@hotmail.com>
 
 pkgname=VSModUpdater
-pkgver=v1.3.4
+pkgver=v1.3.5
 pkgrel=1
 pkgdesc='Vintage Story Mod Updater'
 arch=('x86_64')
@@ -24,6 +24,6 @@ build() {
 
 package() {
   cd "$pkgname"
-  install -D -m755 "result/$pkgname" "$pkgdir/usr/bin/$pkgname"
+  install -D -m755 "bin/linux/$pkgname" "$pkgdir/usr/bin/$pkgname"
   install -D -m644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }

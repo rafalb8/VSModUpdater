@@ -10,7 +10,7 @@ import (
 func main() {
 	switch {
 	case config.Version:
-		fmt.Println(config.VersionNum)
+		fmt.Println(config.BuildVersion())
 
 	case config.Self:
 		modes.Self()

@@ -5,31 +5,24 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
   };
 
-  outputs = { nixpkgs, ... }:
+  outputs = { self, nixpkgs }:
     let
-      version = "v1.3.4";
+      version = "v1.3.5";
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
     in
     {
-      packages.${system}.VSModUpdater = pkgs.buildGoModule {
+      defaultPackage.${system} = pkgs.buildGoModule {
         inherit version;
         pname = "VSModUpdater";
-        src = ./.;
-        vendorHash = null;
+        src = self.outPath;
+        vendorHash = "sha256-sLs/k4HovQoq6JB5jFoOFwiUmVNt7vhoGwjdvfk1fgA=";
 
-        buildPhase = ''
-          runHook preBuild
-          make linux TAG=${version}
-          runHook postBuild
-        '';
-
-        installPhase = ''
-          runHook preInstall
-          mkdir -p $out/bin
-          cp result/VSModUpdater $out/bin/VSModUpdater
-          runHook postInstall
-        '';
+        ldflags = [
+          "-s"
+          "-w"
+          "-X github.com/rafalb8/VSModUpdater/internal/config.version=${version}"
+        ];
 
         meta = with pkgs.lib; {
           description = "Vintage Story Mod Updater";

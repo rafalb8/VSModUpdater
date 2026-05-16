@@ -21,7 +21,7 @@ func Self() {
 		return
 	}
 
-	version, err := mod.NewSemVer(config.VersionNum)
+	version, err := mod.NewSemVer(config.BuildVersion())
 	if err != nil {
 		version, _ = mod.NewSemVer("v0.0.0")
 	}
