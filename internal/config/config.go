@@ -1,11 +1,12 @@
 package config
 
 import (
-	"flag"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
+
+	"github.com/spf13/pflag"
 )
 
 var VersionNum string = "v0.0.0"
@@ -18,7 +19,7 @@ var (
 	Backup      bool
 	Interactive bool
 	PreRelease  bool
-	Ignored     map[string]struct{}
+	Ignored     = map[string]struct{}{}
 )
 
 // Modes
@@ -38,29 +39,31 @@ func init() {
 	cfgPath = filepath.Join(cfgPath, "VintagestoryData")
 
 	// Flags
-	flag.StringVar(&ModPath, "mod-path", filepath.Join(cfgPath, "Mods"), "path to VS mod directory")
-	flag.StringVar(&BackupPath, "backup-path", "", "path to VS mod backup directory")
-	flag.BoolVar(&DryRun, "dry-run", false, "run the updater without actually doing anything")
-	flag.BoolVar(&Backup, "backup", false, "backup mods instead of removing them")
-	flag.BoolVar(&Interactive, "interactive", runtime.GOOS != "linux", "interactive update mode")
-	flag.BoolVar(&PreRelease, "pre-release", false, "allow updating to pre-release mod versions (enabled if mod is already pre-release)")
-	flag.Func("ignore", "disable updates: modID1,modID2,...", func(s string) error {
-		mods := strings.Split(s, ",")
-		Ignored = make(map[string]struct{}, len(mods))
-		for _, modID := range mods {
-			Ignored[modID] = struct{}{}
+	pflag.StringVarP(&ModPath, "mod-path", "m", filepath.Join(cfgPath, "Mods"), "path to VS mod directory")
+	pflag.StringVar(&BackupPath, "backup-path", "", "path to VS mod backup directory")
+	pflag.BoolVarP(&DryRun, "dry-run", "p", false, "run the updater without actually doing anything")
+	pflag.BoolVarP(&Backup, "backup", "b", false, "backup mods instead of removing them")
+	pflag.BoolVarP(&Interactive, "interactive", "t", runtime.GOOS != "linux", "interactive update mode")
+	pflag.BoolVar(&PreRelease, "pre-release", false, "allow updating to pre-release mod versions (enabled if mod is already pre-release)")
+	pflag.FuncP("ignore", "x", "disable updates: modID1,modID2,...", func(s string) error {
+		for modID := range strings.SplitSeq(s, ",") {
+			modID = strings.TrimSpace(modID)
+			if modID != "" {
+				Ignored[modID] = struct{}{}
+			}
 		}
 		return nil
 	})
 
 	// Modes
-	flag.BoolVar(&Self, "self", false, "update VSModUpdater")
-	flag.BoolVar(&Version, "version", false, "print version")
-	flag.BoolVar(&List, "list", false, "list mods")
-	flag.StringVar(&Import, "import", "", "import mod list")
-	flag.StringVar(&Export, "export", "", "export mod list")
+	pflag.BoolVar(&Self, "self", false, "update VSModUpdater")
+	pflag.BoolVarP(&Version, "version", "v", false, "print version")
+	pflag.BoolVarP(&List, "list", "l", false, "list mods")
+	pflag.StringVarP(&Import, "import", "i", "", "import mod list")
+	pflag.StringVarP(&Export, "export", "e", "", "export mod list")
 
-	flag.Parse()
+	// Parse flags
+	pflag.Parse()
 
 	// Make sure modpath is absolute path
 	ModPath, err = filepath.Abs(ModPath)

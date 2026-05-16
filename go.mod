@@ -5,6 +5,7 @@ go 1.26.2
 tool github.com/konoui/lipo
 
 require (
+	github.com/spf13/pflag v1.0.10
 	github.com/tailscale/hujson v0.0.0-20250605163823-992244df8c5a
 	golang.org/x/mod v0.30.0
 )
