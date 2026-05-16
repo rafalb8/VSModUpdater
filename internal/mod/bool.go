@@ -3,27 +3,21 @@ package mod
 import (
 	"strconv"
 	"strings"
+	"unsafe"
 )
 
 type Bool bool
 
-func (b *Bool) MarshalJSON() ([]byte, error) {
-	boolean := false
-	if b != nil {
-		boolean = (bool)(*b)
-	}
-	return []byte(strconv.FormatBool(boolean)), nil
+func (b Bool) MarshalJSON() ([]byte, error) {
+	return []byte(strconv.FormatBool(bool(b))), nil
 }
 
 func (b *Bool) UnmarshalJSON(data []byte) error {
-	boolean := strings.ToLower(strings.Trim(string(data), `"`))
-
-	switch boolean {
-	case "true", "t", "1":
-		*b = true
-	default:
-		*b = false
+	s := unsafe.String(unsafe.SliceData(data), len(data))
+	boolean, err := strconv.ParseBool(strings.Trim(s, `"`))
+	if err != nil {
+		return err
 	}
-
+	*b = Bool(boolean)
 	return nil
 }
