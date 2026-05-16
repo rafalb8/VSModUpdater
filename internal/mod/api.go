@@ -22,7 +22,7 @@ type Response struct {
 	StatusCode string `json:"statuscode,omitempty"`
 }
 
-type Releases struct {
+type Release struct {
 	ReleaseID  int      `json:"releaseid,omitempty"`
 	Mainfile   string   `json:"mainfile,omitempty"`
 	Filename   string   `json:"filename,omitempty"`
@@ -60,7 +60,7 @@ type Mod struct {
 	LastReleased    string     `json:"lastreleased,omitempty"`
 	LastModified    string     `json:"lastmodified,omitempty"`
 	Tags            []string   `json:"tags,omitempty"`
-	Releases        []Releases `json:"releases,omitempty"`
+	Releases        []Release `json:"releases,omitempty"`
 	Screenshots     []any      `json:"screenshots,omitempty"`
 }
 

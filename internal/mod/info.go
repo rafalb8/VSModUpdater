@@ -146,59 +146,69 @@ func (i *Info) Details() string {
 	return sb.String()
 }
 
-// CheckUpdates returns url to latest mod version
-func (i *Info) CheckUpdates() (upd Update, err error) {
+// CheckUpdates returns the url to the latest compatible mod version.
+func (i *Info) CheckUpdates() (Update, error) {
 	if i.ModID == "" {
-		return upd, ErrNoModID
+		return Update{}, ErrNoModID
 	}
 
-	// true if the current version is a prerelease OR if the flag pre-release is set.
+	mod, err := i.fetchReleases()
+	if err != nil {
+		return Update{}, fmt.Errorf("Info.CheckUpdates: %w", err)
+	}
+
 	allowDev := cmp.Or(i.Version.PreRelease(), config.PreRelease)
 
+	return i.findLatestUpdate(mod, allowDev)
+}
+
+func (i *Info) fetchReleases() (*Mod, error) {
 	uri, err := url.JoinPath("https://mods.vintagestory.at/api/mod/", i.ModID)
 	if err != nil {
-		return upd, fmt.Errorf("Info.CheckUpdates: %w", err)
+		return nil, err
 	}
 
 	resp, err := http.Get(uri)
 	if err != nil {
-		return upd, fmt.Errorf("Info.CheckUpdates: %w", err)
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	r := &Response{}
 	err = json.NewDecoder(resp.Body).Decode(r)
 	if err != nil {
-		return upd, fmt.Errorf("Info.CheckUpdates: %w", err)
+		return nil, err
 	}
 
-	upd.Name = r.Mod.Name
-	for _, release := range r.Mod.Releases {
-		if !allowDev && release.ModVersion.PreRelease() {
-			// Skip pre-release version
-			err = ErrPreReleaseSkip
+	return &r.Mod, nil
+}
+
+func (i *Info) findLatestUpdate(mod *Mod, allowDev bool) (Update, error) {
+	hasSkippedDev := false
+	upd := Update{Name: mod.Name}
+
+	for _, rel := range mod.Releases {
+		// skip pre-releases if they aren't allowed
+		if !allowDev && (rel.ModVersion.PreRelease() || IsAllPreRelease(rel.Tags)) {
+			hasSkippedDev = true
 			continue
 		}
 
-		if release.ModVersion.Compare(i.Version) <= 0 {
-			return upd, cmp.Or(err, ErrNoUpdate)
+		// if ModVersion > local, we found update
+		if rel.ModVersion.Compare(i.Version) > 0 {
+			upd.URL = rel.Mainfile
+			upd.Version = rel.ModVersion
+			upd.Filename = rel.Filename
+			return upd, nil
 		}
 
-		// Check if game version is stable
-		if !allowDev && IsAllPreRelease(release.Tags) {
-			// Skip pre-release game version
-			err = ErrUnstableSkip
-			continue
-		}
-
-		if release.ModVersion.Compare(i.Version) > 0 {
-			upd.URL = release.Mainfile
-			upd.Version = release.ModVersion
-			upd.Filename = release.Filename
-			return
-		}
+		break
 	}
-	return upd, fmt.Errorf("Info.CheckUpdates: no release found for %s", i.ModID)
+
+	if hasSkippedDev {
+		return upd, ErrPreReleaseSkip
+	}
+	return upd, ErrNoUpdate
 }
 
 func (i *Info) Backup() error {
