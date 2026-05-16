@@ -29,4 +29,5 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
+          omitBodyDuringUpdate: true
           artifacts: ./bin/*-*.*
