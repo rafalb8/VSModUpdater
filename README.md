@@ -18,60 +18,76 @@ go install -trimpath github.com/rafalb8/VSModUpdater@latest
 ## Usage
 
 ### Flag Reference
-* `-mod-path <path>`
+* `-m, --mod-path <path>`
   * Specifies the path to your Vintage Story mods directory.
-  * **Default:** `~/.config/VintagestoryData/Mods` (on Linux) or `%APPDATA%\VintagestoryData\Mods` (on Windows).
-* `-backup-path <path>`
-  * Specifies where to store mod backups. If not set, uses `mod-path` to determine a sibling directory named `ModBackups`.
+  * **Default:** `~/.config/VintagestoryData/Mods` (on Linux), `%APPDATA%\VintagestoryData\Mods` (on Windows), or the equivalent OS user config directory.
+* `--backup-path <path>`
+  * Specifies where to store mod backups. If not set, defaults to a sibling directory of your `mod-path` named `ModBackups`.
   * **Default:** `~/.config/VintagestoryData/ModBackups` (on Linux) or `%APPDATA%\VintagestoryData\ModBackups` (on Windows).
-* `-dry-run`
-  * If this flag is set, the program will just print the updates.
-* `-backup`
-  * If this flag is set, the program will move old mods to the backup directory instead of deleting them.
-* `-interactive`
-  * Starts the program in an interactive mode, allowing you to select which mods to update. This is the default behavior on Windows.
-* `-pre-release`
-  * Allows updating to pre-release mod versions (e.g., alpha, beta). This functionality is also enabled automatically if a mod is already a pre-release version.
-* `-ignore <modID1,modID2,...>`
-  * Provides a comma-separated list of mod IDs to skip during updates.
+* `-p, --dry-run`
+  * Runs the updater without actually making any changes (print only).
+* `-b, --backup`
+  * Backs up old mods to the backup directory instead of deleting them.
+* `-t, --interactive`
+  * Starts the program in an interactive mode, allowing you to select which mods to update. 
+  * **Default:** `true` on Windows/macOS, `false` on Linux.
+* `--pre-release`
+  * Allows updating to pre-release mod versions (e.g., alpha, beta). This functionality is also enabled automatically if an installed mod is already a pre-release version.
+* `-x, --ignore <modID1,modID2,...>`
+  * Disables updates for a comma-separated list of specific mod IDs.
 
 ### Modes
 The program can run in several modes. You should only use one mode at a time.
 
-* `-version`
+* `-v, --version`
   * Prints the program's version and exits.
-* `-self`
-  * Updates the Vintage Story Mod Updater program itself.
-* `-list`
+* `--self`
+  * Updates the `VSModUpdater` program itself.
+* `-l, --list`
   * Lists all installed mods and their versions.
-* `-import <file>`
-  * Download modlist to `-mod-path`
-* `-export <file>`
-  * Save modlist from `-mod-path` to `<file>`
+* `-i, --import <file>`
+  * Imports and downloads a mod list from the specified file to your `-mod-path`.
+* `-e, --export <file>`
+  * Exports your current mod list from `-mod-path` to the specified file.
 
 
 ### Examples
-**Update all mods:**
+**Update all mods (Standard run):**
 ```sh
 ./VSModUpdater
 ```
+
+**Run a preview of updates without changing any files:**
+```sh
+./VSModUpdater -p
+```
+
 **Update all mods, but back up old ones instead of deleting them:**
 ```sh
-./VSModUpdater -backup
+./VSModUpdater -b
 ```
+
 **Update all mods except for two specific ones:**
 ```sh
-./VSModUpdater -ignore "some-mod-id,another-mod-id"
+./VSModUpdater -x some-mod-id -x another-mod-id
 ```
+
 **List all installed mods:**
 ```sh
-./VSModUpdater -list
+./VSModUpdater -l
 ```
+
 **Check the program's version:**
 ```sh
-./VSModUpdater -version
+./VSModUpdater -v
 ```
+
 **Export modlist to a file:**
 ```sh
-./VSModUpdater -export modlist.txt
+./VSModUpdater -e modlist.txt
+```
+
+**Download modlist from a file to `mods` directory :**
+```sh
+./VSModUpdater -i modlist.txt -m mods
 ```
