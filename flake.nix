@@ -5,9 +5,9 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
   };
 
-  outputs = { self, nixpkgs }:
+  outputs = { nixpkgs, ... }:
     let
-      version = "v1.3.3";
+      version = "v1.3.4";
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
     in
