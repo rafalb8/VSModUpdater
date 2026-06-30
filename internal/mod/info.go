@@ -124,25 +124,42 @@ func (i *Info) String() string {
 
 // Details returns detailed mod info string
 func (i *Info) Details() string {
-	sb := strings.Builder{}
+	var sb strings.Builder
+
+	// Pre-allocating a rough estimate of the buffer size to avoid dynamic reallocations
+	sb.Grow(256)
+
 	if i.Error != nil {
-		sb.WriteString("File:\t\t" + filepath.Base(i.Path) + "\n")
-		sb.WriteString("Error:\t\t" + i.Error.Error())
+		sb.WriteString("File:\t\t")
+		sb.WriteString(filepath.Base(i.Path))
+		sb.WriteString("\nError:\t\t")
+		sb.WriteString(i.Error.Error())
 		return sb.String()
 	}
 
-	sb.WriteString("Name:\t\t" + i.Name + "\n")
-	sb.WriteString("ModID:\t\t" + i.ModID + "\n")
-	sb.WriteString("Version:\t" + i.Version.String() + "\n")
-	gameVer, ok := i.Dependencies["game"]
-	if ok {
+	sb.WriteString("Name:\t\t")
+	sb.WriteString(i.Name)
+
+	sb.WriteString("\nModID:\t\t")
+	sb.WriteString(i.ModID)
+
+	sb.WriteString("\nVersion:\t")
+	sb.WriteString(i.Version.String())
+
+	if gameVer, ok := i.Dependencies["game"]; ok {
 		if gameVer == "*" || gameVer == "" {
 			gameVer = "any"
 		}
-		sb.WriteString("Game Version:\t" + gameVer + "\n")
+		sb.WriteString("\nGame Version:\t")
+		sb.WriteString(gameVer)
 	}
-	sb.WriteString("Authors:\t" + strings.Join(i.Authors, ", ") + "\n")
-	sb.WriteString("Description:\t" + i.Description)
+
+	sb.WriteString("\nAuthors:\t")
+	sb.WriteString(strings.Join(i.Authors, ", "))
+
+	sb.WriteString("\nDescription:\t")
+	sb.WriteString(i.Description)
+
 	return sb.String()
 }
 
