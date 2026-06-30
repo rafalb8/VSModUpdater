@@ -108,7 +108,7 @@ func Update() {
 
 		// Remove the backup
 		fmt.Printf("Removing %s - ", m)
-		err = os.Remove(m.Path)
+		err = os.RemoveAll(m.Path)
 		if err != nil {
 			fmt.Println("FAIL")
 			fmt.Println(err)

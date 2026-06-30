@@ -6,7 +6,6 @@ import (
 	"cmp"
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/fs"
 	"net/http"
 	"net/url"
@@ -42,47 +41,6 @@ type Info struct {
 	Dependencies     map[string]string `json:"dependencies,omitempty"`
 }
 
-func InfoFromZip(filepath string) (*Info, error) {
-	r, err := zip.OpenReader(filepath)
-	if err != nil {
-		return nil, err
-	}
-	defer r.Close()
-
-	for _, f := range r.File {
-		if f.Name != "modinfo.json" {
-			continue
-		}
-
-		fr, err := f.Open()
-		if err != nil {
-			return nil, err
-		}
-		defer fr.Close()
-
-		data, err := io.ReadAll(fr)
-		if err != nil {
-			return nil, err
-		}
-
-		// Sometimes some editors add BOM (Byte Order Mark) to signal endianess.
-		// hujson doesn't like that.
-		data = bytes.TrimPrefix(data, []byte("\ufeff"))
-
-		// Workaround for non-compliant JSON:
-		// Stripping trailing commas here, as a few mods continue
-		// to adhere to a looser standard than the parser.
-		data, err = hujson.Standardize(data)
-		if err != nil {
-			return nil, err
-		}
-
-		info := &Info{Path: filepath}
-		return info, json.Unmarshal(data, info)
-	}
-	return nil, fmt.Errorf("mod.InfoFromZip: no files found in %s", filepath)
-}
-
 // Returns Info slice from zip files
 func InfoFromPath(path string) ([]*Info, error) {
 	mods := []*Info{}
@@ -91,26 +49,60 @@ func InfoFromPath(path string) ([]*Info, error) {
 			return err
 		}
 
-		if d.IsDir() {
+		var modFS fs.FS
+
+		switch {
+		case d.IsDir():
 			if path == config.ModPath {
 				return nil
 			}
-			return fs.SkipDir
-		}
+			modFS = os.DirFS(path)
+			err = fs.SkipDir
 
-		name := d.Name()
-		if filepath.Ext(name) != ".zip" {
+		case filepath.Ext(path) == ".zip":
+			r, err := zip.OpenReader(path)
+			if err != nil {
+				mods = append(mods, &Info{Path: path, Error: err})
+				return nil
+			}
+			defer r.Close()
+			modFS = r
+
+		default:
 			return nil
 		}
 
-		info, err := InfoFromZip(path)
-		if err != nil {
-			info = &Info{Path: path, Error: err}
-		}
-		mods = append(mods, info)
-		return nil
+		mods = append(mods, parseModFS(modFS, path))
+		return err
 	})
 	return mods, err
+}
+
+func parseModFS(modFS fs.FS, path string) *Info {
+	info := &Info{Path: path}
+
+	data, err := fs.ReadFile(modFS, "modinfo.json")
+	if err != nil {
+		info.Error = err
+		return info
+	}
+
+	// Sometimes some editors add BOM (Byte Order Mark) to signal endianess.
+	// hujson doesn't like that.
+	data = bytes.TrimPrefix(data, []byte("\ufeff"))
+
+	// Workaround for non-compliant JSON:
+	// Stripping trailing commas here, as a few mods continue
+	// to adhere to a looser standard than the parser.
+	data, err = hujson.Standardize(data)
+	if err != nil {
+		info.Error = err
+		return info
+	}
+
+	err = json.Unmarshal(data, info)
+	info.Error = err
+	return info
 }
 
 func (i *Info) String() string {
