@@ -9,7 +9,7 @@ import (
 	"github.com/rafalb8/VSModUpdater/v2/internal/mod"
 )
 
-func Interactive() {
+func Simple() {
 	defer func() {
 		fmt.Print("Press any key ")
 		fmt.Scanln()
