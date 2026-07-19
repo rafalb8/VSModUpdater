@@ -210,14 +210,26 @@ func (i *Info) FetchMod() (*Mod, error) {
 }
 
 func (i *Info) findLatestUpdate(mod *Mod, allowDev bool) (Update, error) {
-	hasSkippedDev := false
+	err := ErrNoUpdate
 	upd := Update{Name: mod.Name}
 
 	for _, rel := range mod.Releases {
-		// skip pre-releases if they aren't allowed
-		if !allowDev && (rel.ModVersion.PreRelease() || IsAllPreRelease(rel.Tags)) {
-			hasSkippedDev = true
-			continue
+		if !allowDev {
+			if rel.ModVersion.PreRelease() {
+				if err == ErrNoUpdate {
+					err = ErrPreReleaseSkip
+					upd.Version = rel.ModVersion
+				}
+				continue
+			}
+
+			if IsAllPreRelease(rel.Tags) {
+				if err == ErrNoUpdate {
+					err = ErrUnstableSkip
+					upd.Version = rel.ModVersion
+				}
+				continue
+			}
 		}
 
 		// if ModVersion > local, we found update
@@ -231,10 +243,7 @@ func (i *Info) findLatestUpdate(mod *Mod, allowDev bool) (Update, error) {
 		break
 	}
 
-	if hasSkippedDev {
-		return upd, ErrPreReleaseSkip
-	}
-	return upd, ErrNoUpdate
+	return upd, err
 }
 
 func (i *Info) Backup() error {
