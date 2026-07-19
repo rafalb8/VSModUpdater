@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/rafalb8/VSModUpdater/internal/config"
@@ -21,8 +22,9 @@ import (
 //   - [Wiki](https://wiki.vintagestory.at/Modding:Modinfo)
 //   - [Docs](https://apidocs.vintagestory.at/api/Vintagestory.API.Common.Info.html)
 type Info struct {
-	Path  string `json:"-"`
-	Error error  `json:"-"`
+	Path    string `json:"-"`
+	Error   error  `json:"-"`
+	AssetID int    `json:"-"`
 
 	Type             Type              `json:"type"`
 	Name             string            `json:"name"`
@@ -105,6 +107,17 @@ func parseModFS(modFS fs.FS, path string) *Info {
 	return info
 }
 
+// Page returns mod page url
+func (i *Info) Page() string {
+	uri, _ := url.JoinPath("https://mods.vintagestory.at/", i.ModID)
+
+	r, _ := http.Head(uri)
+	if r.StatusCode != http.StatusOK {
+		uri, _ = url.JoinPath("https://mods.vintagestory.at/show/mod/", strconv.Itoa(i.AssetID))
+	}
+	return uri
+}
+
 func (i *Info) String() string {
 	if i.Name == "" {
 		// Fallback to extracting name from file path
@@ -161,17 +174,17 @@ func (i *Info) CheckUpdates() (Update, error) {
 		return Update{}, ErrNoModID
 	}
 
-	mod, err := i.fetchReleases()
+	mod, err := i.fetchMod()
 	if err != nil {
 		return Update{}, fmt.Errorf("Info.CheckUpdates: %w", err)
 	}
 
+	i.AssetID = mod.AssetID
 	allowDev := cmp.Or(i.Version.PreRelease(), config.PreRelease)
-
 	return i.findLatestUpdate(mod, allowDev)
 }
 
-func (i *Info) fetchReleases() (*Mod, error) {
+func (i *Info) fetchMod() (*Mod, error) {
 	uri, err := url.JoinPath("https://mods.vintagestory.at/api/mod/", i.ModID)
 	if err != nil {
 		return nil, err
