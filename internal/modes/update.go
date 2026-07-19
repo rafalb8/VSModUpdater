@@ -5,8 +5,7 @@ import (
 	"fmt"
 	"iter"
 	"os"
-
-	"golang.org/x/term"
+	"runtime"
 
 	"github.com/rafalb8/VSModUpdater/v2/internal/config"
 	"github.com/rafalb8/VSModUpdater/v2/internal/filter"
@@ -19,11 +18,10 @@ type update struct {
 }
 
 func Update() {
-	s := bufio.NewScanner(os.Stdin)
-	if !term.IsTerminal(int(os.Stdin.Fd())) {
+	if runtime.GOOS != "linux" {
 		defer func() {
 			fmt.Print("Press any key to exit...")
-			s.Scan()
+			fmt.Scanln()
 		}()
 	}
 
@@ -110,6 +108,7 @@ func Update() {
 		fmt.Printf("[%d] %s (%s -> %s) - %s\n", i+1, m.Name, m.Version, m.Update.Version, m.Page())
 	}
 
+	s := bufio.NewScanner(os.Stdin)
 	if !config.NoConfirm {
 		fmt.Println("\n=> Mods to EXCLUDE from update: (e.g. 1 2 3, 1-3, ^4)")
 		fmt.Print("=> ")
