@@ -14,7 +14,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/rafalb8/VSModUpdater/internal/config"
+	"github.com/rafalb8/VSModUpdater/v2/internal/config"
 	"github.com/tailscale/hujson"
 )
 

@@ -1,5 +1,5 @@
 TAG ?= v0.0.0
-LDFLAGS = "-s -w -X github.com/rafalb8/VSModUpdater/internal/config.version=$(TAG)"
+LDFLAGS = "-s -w -X github.com/rafalb8/VSModUpdater/v2/internal/config.version=$(TAG)"
 
 .PHONY: all linux windows darwin darwin-amd64 darwin-arm64 build build-combo build-linux build-windows build-darwin
 

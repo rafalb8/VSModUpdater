@@ -1,4 +1,4 @@
-module github.com/rafalb8/VSModUpdater
+module github.com/rafalb8/VSModUpdater/v2
 
 go 1.26.2
 

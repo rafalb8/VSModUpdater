@@ -7,7 +7,7 @@
 
   outputs = { self, nixpkgs }:
     let
-      version = "v1.4.0";
+      version = "v2.0.0";
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
     in
@@ -21,7 +21,7 @@
         ldflags = [
           "-s"
           "-w"
-          "-X github.com/rafalb8/VSModUpdater/internal/config.version=${version}"
+          "-X github.com/rafalb8/VSModUpdater/v2/internal/config.version=${version}"
         ];
 
         meta = with pkgs.lib; {

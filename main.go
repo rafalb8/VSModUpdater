@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/rafalb8/VSModUpdater/internal/config"
-	"github.com/rafalb8/VSModUpdater/internal/modes"
+	"github.com/rafalb8/VSModUpdater/v2/internal/config"
+	"github.com/rafalb8/VSModUpdater/v2/internal/modes"
 )
 
 func main() {

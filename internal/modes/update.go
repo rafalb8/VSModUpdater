@@ -6,9 +6,9 @@ import (
 	"iter"
 	"os"
 
-	"github.com/rafalb8/VSModUpdater/internal/config"
-	"github.com/rafalb8/VSModUpdater/internal/filter"
-	"github.com/rafalb8/VSModUpdater/internal/mod"
+	"github.com/rafalb8/VSModUpdater/v2/internal/config"
+	"github.com/rafalb8/VSModUpdater/v2/internal/filter"
+	"github.com/rafalb8/VSModUpdater/v2/internal/mod"
 )
 
 type update struct {
