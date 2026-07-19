@@ -80,14 +80,14 @@ func Update() {
 	if len(preReleases) > 0 {
 		fmt.Println(":: Pre-release updates skipped:")
 		for _, m := range preReleases {
-			fmt.Printf(" %s (%s -> %s)\n", m.Name, m.Version, m.Update.Version)
+			fmt.Printf(" %s (%s -> %s) - %s\n", m.Name, m.Version, m.Update.Version, m.Page())
 		}
 	}
 
 	if len(unstable) > 0 {
 		fmt.Println(":: Unstable updates skipped:")
 		for _, m := range unstable {
-			fmt.Printf(" %s (%s -> %s)\n", m.Name, m.Version, m.Update.Version)
+			fmt.Printf(" %s (%s -> %s) - %s\n", m.Name, m.Version, m.Update.Version, m.Page())
 		}
 	}
 
