@@ -10,13 +10,13 @@ build: build-linux build-windows build-darwin build-combo
 build-combo: all
 	cd bin/linux && zip ../VSModUpdater-$(TAG).zip VSModUpdater
 	cd bin/darwin && zip ../VSModUpdater-$(TAG).zip VSModUpdater_macOS
-	cd bin/windows && zip ../VSModUpdater-$(TAG).zip VSModUpdater.exe
+	cd bin/windows && zip ../VSModUpdater-$(TAG).zip VSModUp.exe
 
 build-linux: linux
 	cd bin/linux && tar -czvf ../VSModUpdater-Linux.tar.gz VSModUpdater
 
 build-windows: windows
-	cd bin/windows && zip ../VSModUpdater-Windows.zip VSModUpdater.exe
+	cd bin/windows && zip ../VSModUpdater-Windows.zip VSModUp.exe
 
 build-darwin: darwin
 	cd bin/darwin && tar -czvf ../VSModUpdater-macOS.tar.gz VSModUpdater_macOS
@@ -31,7 +31,7 @@ windows:
 	CGO_ENABLED=0 \
 	GOARCH=amd64 \
 	GOOS=windows \
-	go build -trimpath -ldflags=$(LDFLAGS) -o bin/windows/VSModUpdater.exe .
+	go build -trimpath -ldflags=$(LDFLAGS) -o bin/windows/VSModUp.exe .
 
 darwin: darwin-amd64 darwin-arm64
 	cd bin/darwin && go tool lipo -output VSModUpdater_macOS -create VSModUpdater_amd64 VSModUpdater_arm64
