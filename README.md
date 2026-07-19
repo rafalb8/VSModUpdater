@@ -12,7 +12,7 @@ Simply download the zip file, extract the contents, and run the appropriate exec
 
 If you have `go` installed, you can install it using:
 ```sh
-go install -trimpath github.com/rafalb8/VSModUpdater@latest
+go install -trimpath github.com/rafalb8/VSModUpdater/v2@latest
 ```
 
 ## Usage
