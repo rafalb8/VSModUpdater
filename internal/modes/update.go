@@ -101,9 +101,11 @@ func Update() {
 	}
 
 	s := bufio.NewScanner(os.Stdin)
-	fmt.Println("\n=> Mods to EXCLUDE from update: (e.g. 1 2 3, 1-3, ^4)")
-	fmt.Print("=> ")
-	s.Scan()
+	if !config.NoConfirm {
+		fmt.Println("\n=> Mods to EXCLUDE from update: (e.g. 1 2 3, 1-3, ^4)")
+		fmt.Print("=> ")
+		s.Scan()
+	}
 	fmt.Println()
 
 	filter, err := filter.NewExclusion[update](s.Text())

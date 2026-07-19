@@ -12,10 +12,11 @@ import (
 // Flags
 var (
 	ModPath    string
+	Backup     bool
 	BackupPath string
 	DryRun     bool
-	Backup     bool
 	PreRelease bool
+	NoConfirm  bool
 	Ignored    = map[string]struct{}{}
 )
 
@@ -38,10 +39,11 @@ func init() {
 
 	// Flags
 	pflag.StringVarP(&ModPath, "mod-path", "m", filepath.Join(cfgPath, "Mods"), "path to VS mod directory")
+	pflag.BoolVarP(&Backup, "backup", "b", false, "backup mods instead of removing them")
 	pflag.StringVar(&BackupPath, "backup-path", "", "path to VS mod backup directory")
 	pflag.BoolVarP(&DryRun, "dry-run", "p", false, "run the updater without actually doing anything")
-	pflag.BoolVarP(&Backup, "backup", "b", false, "backup mods instead of removing them")
 	pflag.BoolVar(&PreRelease, "pre-release", false, "allow updating to pre-release mod versions (enabled if mod is already pre-release)")
+	pflag.BoolVarP(&NoConfirm, "no-confirm", "y", false, "automatically confirm all update actions")
 	pflag.FuncP("ignore", "x", "disable updates: modID1,modID2,...", func(s string) error {
 		for modID := range strings.SplitSeq(s, ",") {
 			modID = strings.TrimSpace(modID)
