@@ -18,6 +18,9 @@ func main() {
 	case config.List:
 		modes.List()
 
+	case config.Simple:
+		modes.Interactive()
+
 	case config.Import != "":
 		modes.Import(config.Import)
 

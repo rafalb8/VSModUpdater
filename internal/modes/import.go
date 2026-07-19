@@ -11,7 +11,7 @@ import (
 )
 
 func Import(input string) {
-	if config.Interactive {
+	if config.Simple {
 		defer func() {
 			fmt.Print("Press any key ")
 			fmt.Scanln()
