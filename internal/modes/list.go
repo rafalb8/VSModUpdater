@@ -22,6 +22,7 @@ func List() {
 
 	sep := strings.Repeat("=", 80)
 	for _, m := range mods {
+		m.FetchMod() // Cache AssetID for m.Page()
 		fmt.Println(sep)
 
 		if m.Error != nil {

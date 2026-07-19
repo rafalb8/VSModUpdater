@@ -165,6 +165,9 @@ func (i *Info) Details() string {
 	sb.WriteString("\nDescription:\t")
 	sb.WriteString(i.Description)
 
+	sb.WriteString("\nURL:\t\t")
+	sb.WriteString(i.Page())
+
 	return sb.String()
 }
 
@@ -174,17 +177,16 @@ func (i *Info) CheckUpdates() (Update, error) {
 		return Update{}, ErrNoModID
 	}
 
-	mod, err := i.fetchMod()
+	mod, err := i.FetchMod()
 	if err != nil {
 		return Update{}, fmt.Errorf("Info.CheckUpdates: %w", err)
 	}
 
-	i.AssetID = mod.AssetID
 	allowDev := cmp.Or(i.Version.PreRelease(), config.PreRelease)
 	return i.findLatestUpdate(mod, allowDev)
 }
 
-func (i *Info) fetchMod() (*Mod, error) {
+func (i *Info) FetchMod() (*Mod, error) {
 	uri, err := url.JoinPath("https://mods.vintagestory.at/api/mod/", i.ModID)
 	if err != nil {
 		return nil, err
@@ -202,6 +204,8 @@ func (i *Info) fetchMod() (*Mod, error) {
 		return nil, err
 	}
 
+	// Cache AssetID for i.Page()
+	i.AssetID = r.Mod.AssetID
 	return &r.Mod, nil
 }
 
