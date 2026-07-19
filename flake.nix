@@ -7,7 +7,7 @@
 
   outputs = { self, nixpkgs }:
     let
-      version = "v2.0.1";
+      version = "v2.0.2";
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
     in
@@ -16,7 +16,7 @@
         inherit version;
         pname = "VSModUpdater";
         src = self.outPath;
-        vendorHash = "sha256-sLs/k4HovQoq6JB5jFoOFwiUmVNt7vhoGwjdvfk1fgA=";
+        vendorHash = "sha256-GD9RRUiX21aV8RpT0kN7rEcc2atOgU9ePvWBoLL6t2E=";
 
         ldflags = [
           "-s"
