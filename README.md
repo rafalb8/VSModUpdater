@@ -28,11 +28,10 @@ go install -trimpath github.com/rafalb8/VSModUpdater@latest
   * Runs the updater without actually making any changes (print only).
 * `-b, --backup`
   * Backs up old mods to the backup directory instead of deleting them.
-* `-t, --interactive`
-  * Starts the program in an interactive mode, allowing you to select which mods to update. 
-  * **Default:** `true` on Windows/macOS, `false` on Linux.
 * `--pre-release`
   * Allows updating to pre-release mod versions (e.g., alpha, beta). This functionality is also enabled automatically if an installed mod is already a pre-release version.
+* `-y, --no-confirm`
+  * Automatically confirms all update actions, skipping exclusion prompts.
 * `-x, --ignore <modID1,modID2,...>`
   * Disables updates for a comma-separated list of specific mod IDs.
 
@@ -45,6 +44,8 @@ The program can run in several modes. You should only use one mode at a time.
   * Updates the `VSModUpdater` program itself.
 * `-l, --list`
   * Lists all installed mods and their versions.
+* `-s, --simple`
+  * Runs the updater in a simple update mode.
 * `-i, --import <file>`
   * Imports and downloads a mod list from the specified file to your `-mod-path`.
 * `-e, --export <file>`
@@ -60,6 +61,11 @@ The program can run in several modes. You should only use one mode at a time.
 **Run a preview of updates without changing any files:**
 ```sh
 ./VSModUpdater -p
+```
+
+**Update all mods without prompting for exclusions:**
+```sh
+./VSModUpdater -y
 ```
 
 **Update all mods, but back up old ones instead of deleting them:**
