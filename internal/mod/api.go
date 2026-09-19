@@ -41,7 +41,7 @@ type ModPage struct {
 	Name            string    `json:"name,omitempty"`
 	Text            string    `json:"text,omitempty"`
 	Author          string    `json:"author,omitempty"`
-	UrlAlias        any       `json:"urlalias,omitempty"`
+	UrlAlias        *string   `json:"urlalias,omitempty"`
 	LogoFilename    any       `json:"logofilename,omitempty"`
 	LogoFile        any       `json:"logofile,omitempty"`
 	LogoFileDB      any       `json:"logofiledb,omitempty"`

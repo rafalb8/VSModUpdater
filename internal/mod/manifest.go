@@ -26,9 +26,9 @@ import (
 //   - [Wiki](https://wiki.vintagestory.at/Modding:Modinfo)
 //   - [Docs](https://apidocs.vintagestory.at/api/Vintagestory.API.Common.Manifest.html)
 type Manifest struct {
-	Path    string `json:"-"`
-	Error   error  `json:"-"`
-	AssetID int    `json:"-"`
+	Path  string   `json:"-"`
+	Error error    `json:"-"`
+	Page  *ModPage `json:"-"`
 
 	Type             Type              `json:"type"`
 	Name             string            `json:"name"`
@@ -129,12 +129,12 @@ func parseModFS(modFS fs.FS, path string) *Manifest {
 
 // PageURL returns mod page url
 func (m *Manifest) PageURL() string {
-	uri, _ := url.JoinPath("https://mods.vintagestory.at/", m.ModID)
-
-	r, _ := http.Head(uri)
-	if r.StatusCode != http.StatusOK {
-		uri, _ = url.JoinPath("https://mods.vintagestory.at/show/mod/", strconv.Itoa(m.AssetID))
+	if m.Page.UrlAlias != nil {
+		uri, _ := url.JoinPath("https://mods.vintagestory.at/", *m.Page.UrlAlias)
+		return uri
 	}
+
+	uri, _ := url.JoinPath("https://mods.vintagestory.at/show/mod/", strconv.Itoa(m.Page.AssetID))
 	return uri
 }
 
@@ -207,6 +207,10 @@ func (m *Manifest) CheckUpdates() (Update, error) {
 }
 
 func (m *Manifest) FetchModPage() (*ModPage, error) {
+	if m.Page != nil {
+		return m.Page, nil
+	}
+
 	cache := filepath.Join(os.TempDir(), "VSModUpdater")
 	file := filepath.Join(cache, m.ModID+".json")
 	os.MkdirAll(cache, 0o755)
@@ -220,7 +224,7 @@ func (m *Manifest) FetchModPage() (*ModPage, error) {
 			if err == nil {
 				err := json.NewDecoder(f).Decode(api)
 				if err == nil {
-					m.AssetID = api.Mod.AssetID
+					m.Page = &api.Mod
 					return &api.Mod, nil
 				}
 			}
@@ -250,8 +254,7 @@ func (m *Manifest) FetchModPage() (*ModPage, error) {
 
 	go os.WriteFile(file, body, 0o644)
 
-	// Cache AssetID for i.PageURL()
-	m.AssetID = api.Mod.AssetID
+	m.Page = &api.Mod
 	return &api.Mod, nil
 }
 
