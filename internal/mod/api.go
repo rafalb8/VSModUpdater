@@ -17,9 +17,9 @@ var (
 	ErrUnstableSkip   = errors.New("skipped pre-release game version")
 )
 
-type Response struct {
-	Mod        Mod    `json:"mod"`
-	StatusCode string `json:"statuscode,omitempty"`
+type APIResponse struct {
+	Mod        ModPage `json:"mod"`
+	StatusCode string  `json:"statuscode,omitempty"`
 }
 
 type Release struct {
@@ -35,7 +35,7 @@ type Release struct {
 	Changelog  string   `json:"changelog,omitempty"`
 }
 
-type Mod struct {
+type ModPage struct {
 	ModID           int       `json:"modid,omitempty"`
 	AssetID         int       `json:"assetid,omitempty"`
 	Name            string    `json:"name,omitempty"`

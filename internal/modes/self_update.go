@@ -26,7 +26,7 @@ func Self() {
 		version, _ = mod.NewSemVer("v0.0.0")
 	}
 
-	m := mod.Info{
+	m := mod.Manifest{
 		ModID:   "5060",
 		Version: version,
 	}

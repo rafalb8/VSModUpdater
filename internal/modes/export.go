@@ -25,7 +25,7 @@ func Export(output string) {
 		return
 	}
 
-	mods, err := mod.InfoFromPath(config.ModPath)
+	mods, err := mod.ManifestsFromPath(config.ModPath)
 	if err != nil {
 		fmt.Println(err)
 		return

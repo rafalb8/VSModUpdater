@@ -10,7 +10,7 @@ import (
 )
 
 func List() {
-	mods, err := mod.InfoFromPath(config.ModPath)
+	mods, err := mod.ManifestsFromPath(config.ModPath)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -27,7 +27,7 @@ func List() {
 	for _, m := range mods {
 		wg.Go(func() {
 			sem <- struct{}{}
-			m.FetchMod()
+			m.FetchModPage()
 			<-sem
 		})
 	}

@@ -13,7 +13,7 @@ import (
 )
 
 type update struct {
-	*mod.Info
+	*mod.Manifest
 	Update mod.Update
 }
 
@@ -25,7 +25,7 @@ func Update() {
 		}()
 	}
 
-	mods, err := mod.InfoFromPath(config.ModPath)
+	mods, err := mod.ManifestsFromPath(config.ModPath)
 	if err != nil {
 		fmt.Println("Error loading mods:", err)
 		return
@@ -88,14 +88,14 @@ func Update() {
 	if len(preReleases) > 0 {
 		fmt.Println(":: Pre-release updates skipped:")
 		for _, m := range preReleases {
-			fmt.Printf(" %s (%s -> %s) - %s\n", m.Name, m.Version, m.Update.Version, m.Page())
+			fmt.Printf(" %s (%s -> %s) - %s\n", m.Name, m.Version, m.Update.Version, m.PageURL())
 		}
 	}
 
 	if len(unstable) > 0 {
 		fmt.Println(":: Unstable updates skipped:")
 		for _, m := range unstable {
-			fmt.Printf(" %s (%s -> %s) - %s\n", m.Name, m.Version, m.Update.Version, m.Page())
+			fmt.Printf(" %s (%s -> %s) - %s\n", m.Name, m.Version, m.Update.Version, m.PageURL())
 		}
 	}
 
@@ -105,7 +105,7 @@ func Update() {
 	}
 
 	for i, m := range updates {
-		fmt.Printf("[%d] %s (%s -> %s) - %s\n", i+1, m.Name, m.Version, m.Update.Version, m.Page())
+		fmt.Printf("[%d] %s (%s -> %s) - %s\n", i+1, m.Name, m.Version, m.Update.Version, m.PageURL())
 	}
 
 	s := bufio.NewScanner(os.Stdin)

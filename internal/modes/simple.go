@@ -18,7 +18,7 @@ func Simple() {
 	updateAll := false
 
 	fmt.Println("Updating mods:", config.ModPath)
-	mods, err := mod.InfoFromPath(config.ModPath)
+	mods, err := mod.ManifestsFromPath(config.ModPath)
 	if err != nil {
 		fmt.Println(err)
 		return

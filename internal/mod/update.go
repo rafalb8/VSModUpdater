@@ -20,6 +20,8 @@ type Update struct {
 	Filename string
 }
 
+// UpdateFromString fetches update from id string.
+// line = modID@version
 func UpdateFromString(line string) (upd Update, err error) {
 	modid, version, found := strings.Cut(line, "@")
 	if !found {
@@ -42,14 +44,14 @@ func UpdateFromString(line string) (upd Update, err error) {
 	}
 	defer resp.Body.Close()
 
-	r := &Response{}
-	err = json.NewDecoder(resp.Body).Decode(r)
+	api := &APIResponse{}
+	err = json.NewDecoder(resp.Body).Decode(api)
 	if err != nil {
 		return upd, fmt.Errorf("UpdateFromString: %w", err)
 	}
 
-	upd.Name = r.Mod.Name
-	for _, release := range r.Mod.Releases {
+	upd.Name = api.Mod.Name
+	for _, release := range api.Mod.Releases {
 		if release.ModVersion.Compare(semver) == 0 {
 			upd.URL = release.Mainfile
 			upd.Version = release.ModVersion
