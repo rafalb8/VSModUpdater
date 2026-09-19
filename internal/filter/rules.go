@@ -16,6 +16,8 @@ const (
 
 type Rule func(idx int) Decision
 
+func CatchAll(_ int) Decision { return Exclude }
+
 func RangeRule(before, after string, neg bool) (Rule, error) {
 	min, err1 := strconv.Atoi(before)
 	max, err2 := strconv.Atoi(after)

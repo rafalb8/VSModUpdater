@@ -11,14 +11,16 @@ func NewExclusion[T any](expr string) (ExclusionFilter[T], error) {
 	expr = strings.ReplaceAll(expr, ",", " ")
 
 	filter := ExclusionFilter[T]{}
+	hasPositiveRule := false
+
 	for field := range strings.FieldsSeq(expr) {
 		if field == "" {
 			continue
 		}
 
-		field, newF, neg := strings.Cut(field, "^")
-		if neg {
-			field = newF
+		field, neg := strings.CutPrefix(field, "^")
+		if !neg {
+			hasPositiveRule = true
 		}
 
 		var rule Rule
@@ -36,6 +38,11 @@ func NewExclusion[T any](expr string) (ExclusionFilter[T], error) {
 		}
 		filter = append(filter, rule)
 	}
+
+	if !hasPositiveRule && len(filter) > 0 {
+		filter = append(ExclusionFilter[T]{CatchAll}, filter...)
+	}
+
 	return filter, nil
 }
 
