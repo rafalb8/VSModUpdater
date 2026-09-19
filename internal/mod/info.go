@@ -11,8 +11,10 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"slices"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/rafalb8/VSModUpdater/v2/internal/config"
 	"github.com/tailscale/hujson"
@@ -44,40 +46,56 @@ type Info struct {
 }
 
 // Returns Info slice from zip files
-func InfoFromPath(path string) ([]*Info, error) {
-	mods := []*Info{}
-	err := filepath.WalkDir(config.ModPath, func(path string, d fs.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
+func InfoFromPath(root string) ([]*Info, error) {
+	entries, err := os.ReadDir(root)
+	if err != nil {
+		return nil, err
+	}
 
-		var modFS fs.FS
+	wg := sync.WaitGroup{}
+	results := make(chan *Info, len(entries))
+	sem := make(chan struct{}, 128)
 
-		switch {
-		case d.IsDir():
-			if path == config.ModPath {
-				return nil
+	for _, e := range entries {
+		wg.Go(func() {
+			path := filepath.Join(root, e.Name())
+			var modFS fs.FS
+
+			sem <- struct{}{}
+			defer func() { <-sem }()
+
+			switch {
+			case e.IsDir():
+				modFS = os.DirFS(path)
+
+			case filepath.Ext(path) == ".zip":
+				r, err := zip.OpenReader(path)
+				if err != nil {
+					results <- &Info{Path: path, Error: err}
+					return
+				}
+				defer r.Close()
+				modFS = r
+
+			default:
+				return
 			}
-			modFS = os.DirFS(path)
-			err = fs.SkipDir
 
-		case filepath.Ext(path) == ".zip":
-			r, err := zip.OpenReader(path)
-			if err != nil {
-				mods = append(mods, &Info{Path: path, Error: err})
-				return nil
-			}
-			defer r.Close()
-			modFS = r
+			results <- parseModFS(modFS, path)
+		})
+	}
 
-		default:
-			return nil
-		}
+	go func() {
+		wg.Wait()
+		close(results)
+	}()
 
-		mods = append(mods, parseModFS(modFS, path))
-		return err
-	})
-	return mods, err
+	mods := make([]*Info, 0, len(entries))
+	for info := range results {
+		mods = append(mods, info)
+	}
+	slices.SortFunc(mods, func(a, b *Info) int { return cmp.Compare(a.Path, b.Path) })
+	return mods, nil
 }
 
 func parseModFS(modFS fs.FS, path string) *Info {

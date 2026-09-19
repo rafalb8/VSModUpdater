@@ -3,6 +3,7 @@ package modes
 import (
 	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/rafalb8/VSModUpdater/v2/internal/config"
 	"github.com/rafalb8/VSModUpdater/v2/internal/mod"
@@ -20,9 +21,20 @@ func List() {
 		return
 	}
 
+	// Cache AssetID
+	wg := sync.WaitGroup{}
+	sem := make(chan struct{}, 10)
+	for _, m := range mods {
+		wg.Go(func() {
+			sem <- struct{}{}
+			m.FetchMod()
+			<-sem
+		})
+	}
+	wg.Wait()
+
 	sep := strings.Repeat("=", 80)
 	for _, m := range mods {
-		m.FetchMod() // Cache AssetID for m.Page()
 		fmt.Println(sep)
 
 		if m.Error != nil {
