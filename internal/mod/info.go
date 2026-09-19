@@ -6,6 +6,7 @@ import (
 	"cmp"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/fs"
 	"net/http"
 	"net/url"
@@ -15,6 +16,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/rafalb8/VSModUpdater/v2/internal/config"
 	"github.com/tailscale/hujson"
@@ -205,6 +207,26 @@ func (i *Info) CheckUpdates() (Update, error) {
 }
 
 func (i *Info) FetchMod() (*Mod, error) {
+	cache := filepath.Join(os.TempDir(), "VSModUpdater")
+	file := filepath.Join(cache, i.ModID+".json")
+	os.MkdirAll(cache, 0o755)
+
+	r := &Response{}
+
+	stat, err := os.Stat(file)
+	if err == nil {
+		if time.Since(stat.ModTime()) < 15*time.Minute {
+			f, err := os.Open(file)
+			if err == nil {
+				err := json.NewDecoder(f).Decode(r)
+				if err == nil {
+					i.AssetID = r.Mod.AssetID
+					return &r.Mod, nil
+				}
+			}
+		}
+	}
+
 	uri, err := url.JoinPath("https://mods.vintagestory.at/api/mod/", i.ModID)
 	if err != nil {
 		return nil, err
@@ -216,11 +238,17 @@ func (i *Info) FetchMod() (*Mod, error) {
 	}
 	defer resp.Body.Close()
 
-	r := &Response{}
-	err = json.NewDecoder(resp.Body).Decode(r)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
+
+	err = json.Unmarshal(body, r)
+	if err != nil {
+		return nil, err
+	}
+
+	go os.WriteFile(file, body, 0o644)
 
 	// Cache AssetID for i.Page()
 	i.AssetID = r.Mod.AssetID
