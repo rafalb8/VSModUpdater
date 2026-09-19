@@ -1,7 +1,6 @@
 package mod
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -30,28 +29,17 @@ func UpdateFromString(line string) (upd Update, err error) {
 
 	semver, err := NewSemVer(version)
 	if err != nil {
-		return upd, err
+		return upd, fmt.Errorf("UpdateFromString: %w", err)
 	}
 
-	uri, err := url.JoinPath("https://mods.vintagestory.at/api/mod/", modid)
+	m := Manifest{ModID: modid}
+	page, err := m.FetchModPage()
 	if err != nil {
 		return upd, fmt.Errorf("UpdateFromString: %w", err)
 	}
 
-	resp, err := http.Get(uri)
-	if err != nil {
-		return upd, fmt.Errorf("UpdateFromString: %w", err)
-	}
-	defer resp.Body.Close()
-
-	api := &APIResponse{}
-	err = json.NewDecoder(resp.Body).Decode(api)
-	if err != nil {
-		return upd, fmt.Errorf("UpdateFromString: %w", err)
-	}
-
-	upd.Name = api.Mod.Name
-	for _, release := range api.Mod.Releases {
+	upd.Name = page.Name
+	for _, release := range page.Releases {
 		if release.ModVersion.Compare(semver) == 0 {
 			upd.URL = release.Mainfile
 			upd.Version = release.ModVersion
