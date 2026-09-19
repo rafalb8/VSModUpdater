@@ -150,7 +150,7 @@ func Update() {
 			continue
 		}
 
-		fmt.Println("- OK")
+		fmt.Println(" - OK")
 
 		if config.Backup {
 			continue
