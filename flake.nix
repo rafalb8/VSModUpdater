@@ -7,7 +7,7 @@
 
   outputs = { self, nixpkgs }:
     let
-      version = "v2.0.3";
+      version = "2.1.0";
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
     in
@@ -21,7 +21,7 @@
         ldflags = [
           "-s"
           "-w"
-          "-X github.com/rafalb8/VSModUpdater/v2/internal/config.version=${version}"
+          "-X github.com/rafalb8/VSModUpdater/v2/internal/config.version=v${version}"
         ];
 
         meta = with pkgs.lib; {
@@ -34,7 +34,7 @@
 
       devShells.${system}.default = pkgs.mkShell {
         env.CGO_ENABLED = "0";
-        env.TAG = version;
+        env.TAG = "v${version}";
         packages = with pkgs; [ go zip ];
       };
     };
