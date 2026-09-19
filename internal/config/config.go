@@ -17,6 +17,7 @@ var (
 	DryRun     bool
 	PreRelease bool
 	NoConfirm  bool
+	Force      bool
 	Ignored    = map[string]struct{}{}
 )
 
@@ -44,6 +45,7 @@ func init() {
 	pflag.BoolVarP(&DryRun, "dry-run", "p", false, "run the updater without actually doing anything")
 	pflag.BoolVar(&PreRelease, "pre-release", false, "allow updating to pre-release mod versions (enabled if mod is already pre-release)")
 	pflag.BoolVarP(&NoConfirm, "no-confirm", "y", false, "automatically confirm all update actions")
+	pflag.BoolVar(&Force, "force", false, "force an update of the mod info cache")
 	pflag.FuncP("ignore", "x", "disable updates: modID1,modID2,...", func(s string) error {
 		for modID := range strings.SplitSeq(s, ",") {
 			modID = strings.TrimSpace(modID)

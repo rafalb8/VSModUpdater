@@ -213,21 +213,12 @@ func (m *Manifest) FetchModPage() (*ModPage, error) {
 
 	cache := filepath.Join(os.TempDir(), "VSModUpdater")
 	file := filepath.Join(cache, m.ModID+".json")
-	os.MkdirAll(cache, 0o755)
 
-	api := &APIResponse{}
-
-	stat, err := os.Stat(file)
-	if err == nil {
-		if time.Since(stat.ModTime()) < 15*time.Minute {
-			f, err := os.Open(file)
-			if err == nil {
-				err := json.NewDecoder(f).Decode(api)
-				if err == nil {
-					m.Page = &api.Mod
-					return &api.Mod, nil
-				}
-			}
+	if !config.Force {
+		page := readCache(file)
+		if page != nil {
+			m.Page = page
+			return page, nil
 		}
 	}
 
@@ -247,15 +238,37 @@ func (m *Manifest) FetchModPage() (*ModPage, error) {
 		return nil, err
 	}
 
-	err = json.Unmarshal(body, api)
-	if err != nil {
+	api := &APIResponse{}
+	if err := json.Unmarshal(body, api); err != nil {
 		return nil, err
 	}
 
-	go os.WriteFile(file, body, 0o644)
+	go func() {
+		os.MkdirAll(cache, 0o755)
+		os.WriteFile(file, body, 0o644)
+	}()
 
 	m.Page = &api.Mod
-	return &api.Mod, nil
+	return m.Page, nil
+}
+
+func readCache(file string) *ModPage {
+	stat, err := os.Stat(file)
+	if err != nil || time.Since(stat.ModTime()) > 15*time.Minute {
+		return nil
+	}
+
+	data, err := os.ReadFile(file)
+	if err != nil {
+		return nil
+	}
+
+	var api APIResponse
+	if err := json.Unmarshal(data, &api); err != nil {
+		return nil
+	}
+
+	return &api.Mod
 }
 
 func (m *Manifest) findLatestUpdate(mod *ModPage, allowDev bool) (Update, error) {

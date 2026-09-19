@@ -32,6 +32,8 @@ go install -trimpath github.com/rafalb8/VSModUpdater/v2@latest
   * Allows updating to pre-release mod versions (e.g., alpha, beta). This functionality is also enabled automatically if an installed mod is already a pre-release version.
 * `-y, --no-confirm`
   * Automatically confirms all update actions, skipping exclusion prompts.
+* `--force`
+  * Ignores the local cache and fetches fresh mod info from the API.
 * `-x, --ignore <modID1,modID2,...>`
   * Disables updates for a comma-separated list of specific mod IDs.
 
